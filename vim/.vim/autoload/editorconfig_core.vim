@@ -1,0 +1,1 @@
+../_git/editorconfig-vim/autoload/editorconfig_core.vim

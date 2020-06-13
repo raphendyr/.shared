@@ -22,6 +22,7 @@ if has("autocmd")
     \| exe "normal! g'\"" | endif
 endif
 
+"
 " Syntax & indent
 "
 syntax on
@@ -58,9 +59,19 @@ set showcmd         " Show (partial) command in status line.
 set showmatch       " Show matching brackets.
 set smartcase       " Do smart case matching
 
+" Keybindings
+nnoremap <silent> <Leader>w :w<CR>
+nnoremap <silent> <Leader>q :q<CR>
 
+"
 " Plugin Config
 "
+
+" netrw + vinegar
+let g:netrw_home = g:vim_cache_dir
+let g:netrw_liststyle = 3
+let g:netrw_nogx = 1
+nnoremap <silent> <Leader>o :Lexplore<CR>
 
 " Editorconfig
 "let g:EditorConfig_verbose = 1

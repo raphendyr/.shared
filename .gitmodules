@@ -4,3 +4,6 @@
 [submodule "vim/.vim/_git/vim-commentary"]
 	path = vim/.vim/_git/vim-commentary
 	url = https://github.com/tpope/vim-commentary.git
+[submodule "vim/.vim/_git/vim-vinegar"]
+	path = vim/.vim/_git/vim-vinegar
+	url = https://github.com/tpope/vim-vinegar.git

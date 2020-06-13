@@ -1,0 +1,1 @@
+../_git/vim-vinegar/plugin/vinegar.vim

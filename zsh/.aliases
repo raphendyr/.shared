@@ -3,5 +3,71 @@ alias ls='ls -F --color=auto'
 alias vi="vim"
 
 
+## Docker & Minikube stuff
+#
+if which minikube >/dev/null; then
+	# minikube completion
+	if [ "${ZSH_VERSION:-}" ]; then
+		source <(minikube completion zsh)
+	elif [ "${BASH_VERSION:-}" ]; then
+		source <(minikube completion bash)
+	fi
+
+	# helper to connect docker to minikube
+	docker-on-minikube() {
+		case "${1:-}" in
+			(off|disconnect)
+				unset DOCKER_TLS_VERIFY DOCKER_HOST DOCKER_CERT_PATH MINIKUBE_ACTIVE_DOCKERD
+				;;
+			(on|connect)
+				eval $(minikube -p ${2:-minikube} docker-env)
+				;;
+			(*)
+				eval $(minikube -p ${1:-minikube} docker-env)
+				;;
+		esac
+	}
+
+	# zsh
+	if [ "${ZSH_VERSION:-}" ] && type compdef 1>/dev/null 2>/dev/null; then
+		_minikube_profiles() {
+			local -a profiles
+			profiles=(${(f)"$(/bin/ls "$HOME/.minikube/profiles")"})
+			_describe -t profiless "profiles" profiles
+		}
+		_docker-on-minikube() {
+			local curcontext="$curcontext" state line ret=1
+			local -a commands
+			commands=(
+				"on:Connect docker to minikube"
+				connect
+				"off:Disconned docker from minikube"
+				disconnect
+			)
+			_arguments -C \
+				'(-): :->commands' \
+				'(-)*:: :->arguments'
+			case "$state" in
+				(commands)
+					_describe -t commands 'commands' commands && ret=0
+					;;
+				(arguments)
+					curcontext="${curcontext%:*}-${words[1]}:"
+					case "${words[1]}" in
+						(on|connect)
+							_arguments ':profiles:_minikube_profiles' && ret=0
+							;;
+						(*)
+							;;
+					esac
+					;;
+			esac
+			return ret
+		}
+		compdef _docker-on-minikube docker-on-minikube
+	fi
+fi
+
+
 [ -r "$HOME/.aliases.local" ] && . "$HOME/.aliases.local"
 # vim: set ts=4 sw=4 tw=0 noet syntax=zsh filetype=zsh :

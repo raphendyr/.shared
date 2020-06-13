@@ -1,0 +1,15 @@
+[alias]
+	lol = !git log --graph --decorate --pretty=oneline --abbrev-commit --all || true
+	ls-ignored = ls-files -o -i --exclude-standard
+[color]
+	ui = auto
+[core]
+	hooksPath = ~/.githooks
+[user]
+	name = Jaakko Kantojärvi
+	email = jaakko@n-1.fi
+
+[include]
+	path = ~/.gitconfig.local
+
+;  vim: set ts=4 sw=4 tw=0 noet :

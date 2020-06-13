@@ -1,0 +1,41 @@
+#!/bin/sh -eu
+
+remote="$1"
+url="$2"
+
+scripts=$(dirname "$0")
+z40=0000000000000000000000000000000000000000
+
+while read local_ref local_sha remote_ref remote_sha; do
+	if [ "$local_sha" = $z40 ]; then
+		# Handle delete
+		:
+	else
+		if [ "$remote_sha" = $z40 ]; then
+			# New branch, examine all commits
+			range="$local_sha"
+		else
+			# Update to existing branch, examine new commits
+			range="$remote_sha..$local_sha"
+		fi
+
+		# Check for WIP commit
+		commit=$(git rev-list -n 1 -i --grep '^WIP' "$range")
+		if [ -n "$commit" ]; then
+			echo "Found WIP commit(s) in $local_ref, not pushing" >&2
+			git log --pretty=oneline --abbrev-commit --decorate --color -i --grep '^WIP' "$range" | sed 's/^/  /' >&2
+			exit 1
+		fi
+
+		# Reject if there are commit warnings
+		if [ "$local_sha" = "$(git rev-parse HEAD)" ]; then
+			if ! "$scripts/prepare-commit-msg" "" pre-push >&2; then
+				echo 'Use `git push --no-verify ...` to ignore this!' >&2
+				exit 1
+			fi
+		fi
+	fi
+done
+
+exit 0
+# vim: set ts=4 sw=4 tw=0 noet :

@@ -1,0 +1,61 @@
+#!/bin/sh -eu
+
+msg_file=$1
+msg_type=${2:-}
+
+on_error=0
+
+case "$msg_type" in
+	#commit|template)
+	#	;;
+	pre-push)
+		on_error=1
+		;;
+	message|merge|squash)
+		# do not add anything when doing merges or squashes
+		exit 0
+		;;
+esac
+
+group_grep() {
+	awk -F: '
+{
+  f=$1; l=$2;
+  $1=""; $2="";
+  arr[f][l] = $0
+}
+END {
+  for (f in arr) {
+    print f;
+    for (l in arr[f]) {
+      gsub(/^\s*/, "", arr[f][l]);
+      printf("  %4d: %s\n", l, arr[f][l]);
+    }
+  }
+}'
+}
+
+file_prefix() {
+	sed 's/^/#\t/'
+}
+
+stdout_prefix() {
+	sed 's/^/	/'
+}
+
+if [ "$msg_file" -a -e "$msg_file" ]; then
+	exec >> "$msg_file"
+	prefix=file_prefix
+else
+	prefix=stdout_prefix
+fi
+
+fixmes=$(git grep -nF 'FIXME' | grep -v 'git/.githooks/prepare-commit-msg' || true)
+if [ "$fixmes" ]; then
+	echo "# existing FIXMEs:"
+	echo "$fixmes"|group_grep|$prefix
+	exit $on_error
+fi
+
+exit 0
+# vim: set ts=4 sw=4 tw=0 noet :

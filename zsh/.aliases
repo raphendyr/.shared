@@ -1,0 +1,7 @@
+# ~/.aliases
+alias ls='ls -F --color=auto'
+alias vi="vim"
+
+
+[ -r "$HOME/.aliases.local" ] && . "$HOME/.aliases.local"
+# vim: set ts=4 sw=4 tw=0 noet syntax=zsh filetype=zsh :

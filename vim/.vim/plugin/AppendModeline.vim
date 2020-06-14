@@ -4,8 +4,10 @@
 
 if !exists('AppendModeline')
     function s:AppendModeline()
-        let l:modeline = printf(" vim: set ts=%d sw=%d tw=%d %set :",
-            \ &tabstop, &shiftwidth, &textwidth, &expandtab ? '' : 'no')
+        let l:modeline = printf(
+            \ " vim: set ts=%d sw=%d tw=%d %set syn=%s ft=%s :",
+            \ &tabstop, &shiftwidth, &textwidth, &expandtab ? '' : 'no',
+            \ &syntax, &filetype)
         let l:modeline = substitute(&commentstring, "%s", l:modeline, "")
         call append(line("$"), l:modeline)
     endfunction

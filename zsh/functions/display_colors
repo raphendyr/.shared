@@ -1,0 +1,32 @@
+function display_colors() {
+	local names name color1 color2 color support
+	names=(black red green yellow blue magenta cyan white)
+	color=0
+	for name in $names; do
+		for color1 in 38 48; do
+			[[ $color1 == 38 ]] && color2='48;5;0' || color2='38;5;0'
+			#echo $support $fgbg $color $name
+			printf "\\e[%d;5;%dm\\e[%sm %7s (%d) \\e[0m" $color1 $color $color2 $name $color
+			printf "\\e[%d;5;%dm\\e[%sm %7s (%02d) \\e[0m" $color1 $((color + 8)) $color2 $name $((color + 8))
+		done
+		((color++))
+		echo
+	done
+	for color1 in 38 48; do
+		[[ $color1 == 38 ]] && color2='48;5;0' || color2='38;5;0'
+		for color in {232..255}; do
+			printf "\\e[%d;5;%dm\\e[%sm %03d\\e[0m" $color1 $color $color2 $color
+		done
+		echo
+	done
+	for color1 in 38 48; do
+		[[ $color1 == 38 ]] && color2='48;5;0' || color2='38;5;0'
+		for color in {16..231}; do
+			printf "\\e[%d;5;%dm\\e[%sm %03d\\e[0m" $color1 $color $color2 $color
+			(((color - 16 + 1) % 12 == 0)) && echo
+		done
+	done
+}
+display_colors
+
+# vim: set ts=4 sw=4 tw=0 noet syn=zsh ft=zsh :

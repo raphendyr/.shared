@@ -1,6 +1,14 @@
 # ~/.aliases
+# typos/generics
+alias ..='cd ..'
+alias cd..='cd ..'
+
+# defaults
 alias ls='ls -F --color=auto'
 alias vi="vim"
+
+# short aliases for commands
+alias g=git
 
 
 ## Docker & Minikube stuff

@@ -1,6 +1,10 @@
 [alias]
+	a = add
+	d = diff
+	l = !git log --graph --decorate --pretty=oneline --abbrev-commit --all || true
 	lol = !git log --graph --decorate --pretty=oneline --abbrev-commit --all || true
 	ls-ignored = ls-files -o -i --exclude-standard
+	s = status --short
 [color]
 	ui = auto
 [core]

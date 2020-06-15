@@ -102,6 +102,7 @@ if [ -L ~/.zshrc ]; then
 		my-git-info \
 		my-docker-info \
 		zsh-syntax-highlighting \
+		fzf \
 	; do
 		p="$ZSH_ROOT/plugins/$p/$p.zsh"
 		if [ -f "$p" ]; then

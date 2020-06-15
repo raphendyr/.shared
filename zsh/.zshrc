@@ -101,6 +101,7 @@ if [ -L ~/.zshrc ]; then
 		my-title \
 		my-git-info \
 		my-docker-info \
+		zsh-autosuggestions \
 		zsh-syntax-highlighting \
 		fzf \
 	; do

@@ -2,11 +2,12 @@
 ZSH_CACHE_DIR="${XDG_CACHE_HOME:-$HOME/.cache}/zsh"
 [ -d "$ZSH_CACHE_DIR" ] || mkdir -p "$ZSH_CACHE_DIR"
 
+setopt appendhistory extended_history hist_expire_dups_first hist_ignore_dups
 HISTFILE="$ZSH_CACHE_DIR/zsh_history"
-HISTSIZE=5000
+HISTSIZE=50000
 SAVEHIST=10000
 
-setopt appendhistory autocd extendedglob correct interactive_comments
+setopt autocd extendedglob correct interactive_comments
 unsetopt beep nomatch ignoreeof
 
 [ -z "$LS_COLORS" ] && which dircolors >/dev/null && eval `dircolors -b`

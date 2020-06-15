@@ -83,13 +83,20 @@ stty erase 
 stty intr  
 
 # PS1
-#PS1='%B%m%b %~ %(?..%B%F{red}%?%f%b )%# '
-#PS1='%F{green}%n@%m%f:%F{cyan}%~%f%(?.. %B%F{red}%?%f%b )%# '
-PS1='%F{green}%n@%m%f:%F{cyan}%(6~|%-2~/…/%3~|%~)%f%(?.. %B%F{red}%?%f%b )%# '
-#RPS1='%1v'
-if [ -r "/etc/debian_chroot" -a -s "/etc/debian_chroot" ]; then
-    PS1="($(cat /etc/debian_chroot))$PS1"
+if [[ $EUID == 0 ]]; then
+	PS1='%F{red}%B%m%b%f'
+else
+	PS1='%F{green}%n@%m%f'
 fi
+# full path: ':%F{cyan}%~%f'
+PS1="$PS1"':%F{cyan}%(6~|%-2~/…/%3~|%~)%f%(?.. %F{red}%B%?%b%f )%# '
+if [ -r "/etc/debian_chroot" -a -s "/etc/debian_chroot" ]; then
+    PS1="(%F{yellow}$(cat /etc/debian_chroot)%f)$PS1"
+fi
+PS2='%F{magenta}%B%_%b%f> '
+PS3='%F{magenta}%B?%b%f# '
+PS4='%B%F{black}+%b%F{cyan}%N%f:%F{blue}%i%f> '
+#RPS1='%1v'
 
 # Handle functions and plugins
 fpath=("${XDG_DATA_HOME:-$HOME/.local/share}/zsh/functions" $fpath)

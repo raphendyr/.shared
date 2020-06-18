@@ -34,13 +34,6 @@ if has("autocmd")
     " Load indentation rules according to the detected filetype.
     filetype plugin indent on
 
-    " Show trailing whitespace and spaces before a tab
-    highlight ExtraWhitespace term=reverse ctermfg=Black ctermbg=DarkGreen guifg=bg guibg=DarkGreen
-    autocmd ColorScheme * highlight ExtraWhitespace term=reverse ctermfg=Black ctermbg=DarkGreen guifg=bg guibg=DarkGreen
-    autocmd InsertEnter * match ExtraWhitespace /\s\+\%#\@<!$\| \+\ze\t/
-    autocmd InsertLeave * match ExtraWhitespace /\s\+$\| \+\ze\t/
-    autocmd BufWinEnter * match ExtraWhitespace /\s\+$\| \+\ze\t/
-
     " Makefile sanity
     autocmd BufNewFile,BufRead ?akefile* set noet ts=4 sw=4
     autocmd BufNewFile,BufRead */debian/rules set noet ts=4 sw=4
@@ -72,6 +65,11 @@ let g:netrw_home = g:vim_cache_dir
 let g:netrw_liststyle = 3
 let g:netrw_nogx = 1
 nnoremap <silent> <Leader>o :Lexplore<CR>
+
+" Better Whitespace
+let g:better_whitespace_ctermcolor='DarkGreen'
+let g:better_whitespace_guicolor='DarkGreen'
+let g:better_whitespace_filetypes_blacklist=['diff']
 
 " Editorconfig
 "let g:EditorConfig_verbose = 1

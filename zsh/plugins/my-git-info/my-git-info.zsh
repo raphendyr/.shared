@@ -34,12 +34,17 @@ function +vi-git-st() {
 	stashes="${hook_com[base]}/.git/logs/refs/stash"
 	stashes=$(test -e "$stashes" && wc -l < "$stashes")
 	(( $stashes )) && hook_com[unstaged]="@$stashes"
+
+	# remember git root
+	gr=$(realpath "--relative-to=$PWD" "${hook_com[base]}" 2>/dev/null)
+	[ -z "$gr" -o ${#gr} -gt ${#hook_com[base]} ] && gr=${hook_com[base]}
 }
 
 # set RPS1 to vcs_info (this should be the first plugin touching that)
 function +vi-precmd() {
 	vcs_info
 	RPS1="$vcs_info_msg_0_"
+	[ "$vcs_info_msg_0_" ] || unset gr
 }
 
 add-zsh-hook precmd +vi-precmd

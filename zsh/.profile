@@ -2,9 +2,12 @@
 #umask 022
 
 export DEBEMAIL=jaakko@n-1.fi
-export EDITOR=vim
-export VISUAL=vim
 export LIBVIRT_DEFAULT_URI="qemu:///system"
+
+if which vim >/dev/null; then
+	export EDITOR=vim
+	export VISUAL=vim
+fi
 
 # add private bin filders
 for d in "bin" ".bin" ".local/bin"; do

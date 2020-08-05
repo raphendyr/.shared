@@ -86,7 +86,7 @@ stty intr  
 if [[ $EUID == 0 ]]; then
 	PS1='%F{red}%B%m%b%f'
 else
-	PS1='%F{green}%n@%m%f'
+	PS1='%F{green}%n%f@%F{green}%m%f'
 fi
 # full path: ':%F{cyan}%~%f'
 PS1="$PS1"':%F{cyan}%(6~|%-2~/…/%3~|%~)%f%(?.. %F{red}%B%?%b%f )%# '

@@ -22,6 +22,13 @@ fi
 alias g=git
 
 
+# Chrome remote work...
+if which chromium >/dev/null; then
+	alias chromium-temp="chromium --temp-profile"
+	alias chromium-proxy="chromium --temp-profile --proxy-server='socks5://localhost:9999' --proxy-bypass-list='<-loopback>'"
+fi
+
+
 ## Docker & Minikube stuff
 #
 if which minikube >/dev/null; then

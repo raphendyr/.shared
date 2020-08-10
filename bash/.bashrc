@@ -54,10 +54,16 @@ PS2='\[\e[01;35m\]>\[\e[0m\] ' # magenta > res
 PS3='\[\e[01;35m\]?\[\e[0m\]# ' # magenta ? res #
 PS4='\[\e[01;30m\]+\[\e[0m\] ' # light-black + res
 
-# Read aliases
+# Aliases
 [ -f "$HOME/.travis/travis.sh" ] && . "$HOME/.travis/travis.sh"
 [ -r "$HOME/.aliases" ] && . "$HOME/.aliases"
+
+# Completion
+! shopt -oq posix && [ -f /etc/bash_completion ] && . /etc/bash_completion
+
+# Local changes
 [ -r "$HOME/.bashrc.local" ] && . "$HOME/.bashrc.local"
+
 true # set exit 0 for prompt
 
 # vim: set ts=4 sw=4 tw=0 noet syntax=bash filetype=bash :

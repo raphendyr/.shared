@@ -19,6 +19,12 @@ while read local_ref local_sha remote_ref remote_sha; do
 			range="$remote_sha..$local_sha"
 		fi
 
+		# Verify that the remote commit has been fetched
+		if ! git cat-file -e "$remote_sha^{commit}" 2>/dev/null; then
+			echo "Remote has unfetched changes, run 'git fetch $remote'"
+			exit 1
+		fi
+
 		# Check for WIP commit
 		commit=$(git rev-list -n 1 -i --grep '^WIP' "$range")
 		if [ -n "$commit" ]; then
@@ -29,7 +35,7 @@ while read local_ref local_sha remote_ref remote_sha; do
 
 		# Reject if there are commit warnings
 		if [ "$local_sha" = "$(git rev-parse HEAD)" ]; then
-			if ! "$scripts/prepare-commit-msg" "" pre-push >&2; then
+			if ! "$scripts/prepare-commit-msg" "" pre-push "$range" >&2; then
 				echo 'Use `git push --no-verify ...` to ignore this!' >&2
 				exit 1
 			fi

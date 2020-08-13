@@ -4,11 +4,14 @@ msg_file=$1
 msg_type=${2:-}
 
 on_error=0
+commit_range=
 
 case "$msg_type" in
 	#commit|template)
 	#	;;
 	pre-push)
+		# NOTE: a custom type used when called from pre-push hook
+		commit_range=${3:-}
 		on_error=1
 		;;
 	message|merge|squash)
@@ -50,7 +53,12 @@ else
 	prefix=stdout_prefix
 fi
 
-fixmes=$(git grep -nF 'FIXME' | grep -v 'git/.githooks/prepare-commit-msg' || true)
+if [ "$commit_range" ]; then
+	fixmes=$(git diff --name-only "$commit_range" | xargs git grep -nF 'FIXME' || true)
+else
+	fixmes=$(git grep -nF 'FIXME' | grep -v 'git/.githooks/prepare-commit-msg' || true)
+fi
+
 if [ "$fixmes" ]; then
 	echo "# existing FIXMEs:"
 	echo "$fixmes"|group_grep|$prefix

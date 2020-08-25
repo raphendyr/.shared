@@ -2,10 +2,19 @@
 ZSH_CACHE_DIR="${XDG_CACHE_HOME:-$HOME/.cache}/zsh"
 [ -d "$ZSH_CACHE_DIR" ] || mkdir -m 0700 -p "$ZSH_CACHE_DIR"
 
+# History
 setopt appendhistory extended_history hist_expire_dups_first hist_ignore_dups
 HISTFILE="$ZSH_CACHE_DIR/zsh_history"
 HISTSIZE=50000
 SAVEHIST=10000
+HISTORY_IGNORE="(ls|ls *|cd|cd..|cd ..|pwd|exit|rm -rf *)"
+HISTORY_IGNORE_SESSION="(exit|rm -rf *)"
+zshaddhistory() {
+  emulate -L zsh
+  # when HISTORY_IGNORE requires EXTENDED_GLOB syntax
+  #setopt extendedglob
+  [[ $1 != ${~HISTORY_IGNORE_SESSION} ]]
+}
 
 setopt autocd extendedglob correct interactive_comments
 unsetopt beep nomatch ignoreeof

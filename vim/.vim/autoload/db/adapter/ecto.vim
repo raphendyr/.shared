@@ -1,0 +1,1 @@
+../../../_git/vim-elixir/autoload/db/adapter/ecto.vim

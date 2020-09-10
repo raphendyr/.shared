@@ -7,15 +7,17 @@ alias cd..='cd ..'
 alias vi="vim"
 
 # ls colors
-[ -z "$LS_COLORS" ] && which dircolors >/dev/null && eval `dircolors -b`
-if [ "$LS_COLORS" ] && ls --color -d . >/dev/null 2>&1; then
-	alias ls='ls -F --color=auto'
-elif ls -G -d . >/dev/null 2>&1; then
-	export CLICOLOR=1
-	export LSCOLORS=ExFxBxDxCxegedabagacad
-	alias ls='ls -FG'
-else
-	alias ls='ls -F'
+if [ -z "$NO_COLOR" ]; then
+	[ -z "$LS_COLORS" ] && which dircolors >/dev/null && eval $(dircolors -b)
+	if [ "$LS_COLORS" ] && ls --color -d . >/dev/null 2>&1; then
+		alias ls='ls -F --color=auto'
+	elif ls -G -d . >/dev/null 2>&1; then
+		export CLICOLOR=1
+		export LSCOLORS=ExFxBxDxCxegedabagacad
+		alias ls='ls -FG'
+	else
+		alias ls='ls -F'
+	fi
 fi
 
 # short aliases for commands

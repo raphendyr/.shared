@@ -18,6 +18,7 @@ zshaddhistory() {
 
 setopt autocd extendedglob correct interactive_comments
 unsetopt beep nomatch ignoreeof
+setopt hup # send hup to jobs on disown (exit)
 
 if [ -z "$LS_COLORS" ]; then
 	# recalculate if dircolors exists, elese use a cached entry
@@ -109,7 +110,9 @@ fi
 PS2='%F{magenta}%B%_%b%f> '
 PS3='%F{magenta}%B?%b%f# '
 PS4='%B%F{black}+%b%F{cyan}%N%f:%F{blue}%i%f> '
+# RPROMPT
 #RPS1='%1v'
+setopt transient_rprompt # remove right prompt after command is entered
 
 # Handle functions and plugins
 fpath=("${XDG_DATA_HOME:-$HOME/.local/share}/zsh/functions" $fpath)
@@ -122,6 +125,7 @@ if [ -L ~/.zshrc ]; then
 		my-title \
 		my-git-info \
 		my-docker-info \
+		my-jobs-info \
 		zsh-autosuggestions \
 		zsh-syntax-highlighting \
 		fzf \

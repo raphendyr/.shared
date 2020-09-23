@@ -1,6 +1,9 @@
 # ~/.zshrc
-ZSH_CACHE_DIR="${XDG_CACHE_HOME:-$HOME/.cache}/zsh"
-[ -d "$ZSH_CACHE_DIR" ] || mkdir -m 0700 -p "$ZSH_CACHE_DIR"
+[[ $ZSH ]] || ZSH="${${(%):-%x}:A:h}"
+[[ $ZSH == ${HOME:A} ]] && ZSH="${XDG_CONFIG_HOME:-$HOME/.config}/zsh"
+[[ $ZSH_DATA_DIR ]] || ZSH_DATA_DIR="${XDG_DATA_HOME:-$HOME/.local/share}/zsh"
+[[ $ZSH_CACHE_DIR ]] || ZSH_CACHE_DIR="${XDG_CACHE_HOME:-$HOME/.cache}/zsh"
+[[ -d $ZSH_CACHE_DIR ]] || mkdir -m 0700 -p "$ZSH_CACHE_DIR"
 
 # History
 setopt appendhistory extended_history hist_expire_dups_first hist_ignore_dups
@@ -109,19 +112,17 @@ if [ -r "/etc/debian_chroot" -a -s "/etc/debian_chroot" ]; then
 fi
 PS2='%F{magenta}%B%_%b%f> '
 PS3='%F{magenta}%B?%b%f# '
-PS4='%B%F{black}+%b%F{cyan}%N%f:%F{blue}%i%f> '
+PS4='%B%F{black}+%b%f%F{blue}%I%f:%F{cyan}%N%f:%F{blue}%i%f> '
 # RPROMPT
 #RPS1='%1v'
 setopt transient_rprompt # remove right prompt after command is entered
 
 # Handle functions and plugins
-fpath=("${XDG_DATA_HOME:-$HOME/.local/share}/zsh/functions" $fpath)
-if [ -L ~/.zshrc ]; then
-	ZSH_ROOT=$(cd ~; cd "${$(readlink ~/.zshrc)%/*}"; echo "$PWD")
-	fpath=("$ZSH_ROOT/functions" $fpath)
-
+[[ -d "$ZSH_DATA_DIR/functions" ]] && fpath=("$ZSH_DATA_DIR/functions" $fpath)
+[[ -d "$ZSH/functions" ]] && fpath=("$ZSH/functions" $fpath)
+if [[ -d "$ZSH/plugins" ]]; then
 	autoload -Uz add-zsh-hook
-	for p in \
+	for _plugin in \
 		my-title \
 		my-git-info \
 		my-docker-info \
@@ -130,22 +131,22 @@ if [ -L ~/.zshrc ]; then
 		zsh-syntax-highlighting \
 		fzf \
 	; do
-		p="$ZSH_ROOT/plugins/$p/$p.zsh"
-		if [ -f "$p" ]; then
-			. "$p"
-			p="${p%/*}.local.zsh"
-			[ -f "$p" ] && . "$p"
+		_path="$ZSH/plugins/$_plugin/$_plugin.zsh"
+		if [[ -f $_path ]]; then
+			. "$_path"
+			[[ -f "${_path:h}.local.zsh" ]] && . "${_path:h}.local.zsh"
 		else
-			echo "Unable read '$p', are submodules downloaded?"
+			echo "Unable read '$_path', are submodules downloaded?"
 		fi
-	done; unset p
+	done; unset _plugin _path
 fi
-for p in $fpath; do
-	[ "${p#$HOME}" = "$p" ] && break
-	for f in "$p/"*; do
-		[ -f "$f" ] && n=${f##*/} && [ "${n#_}" = "$n" ] && autoload -Uz "$n"
+# autload all functions from fpaths under HOME
+for _path ($fpath); do
+	[[ $_path != "$HOME/"* ]] && break
+	for _function in "$_path/"*(.); do
+		[[ -f $_function && ${_function:t} != _* ]] && autoload -Uz "${_function:t}"
 	done
-done; unset p f n
+done; unset _path _function
 
 # Read aliases
 [ -f "$HOME/.travis/travis.sh" ] && . "$HOME/.travis/travis.sh"

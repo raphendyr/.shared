@@ -167,6 +167,7 @@ if [[ -d "$ZSH/plugins" ]]; then
 		my-title \
 		my-git-info \
 		my-docker-info \
+		dotenv \
 		my-jobs-info \
 		zsh-autosuggestions \
 		zsh-syntax-highlighting \

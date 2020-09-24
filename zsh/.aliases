@@ -7,7 +7,7 @@ alias cd..='cd ..'
 alias vi="vim"
 
 # ls colors
-if [ -z "$NO_COLOR" ]; then
+if [ -z "${NO_COLOR:-}" ]; then
 	[ -z "$LS_COLORS" ] && which dircolors >/dev/null && eval $(dircolors -b)
 	if [ "$LS_COLORS" ] && ls --color -d . >/dev/null 2>&1; then
 		alias ls='ls -F --color=auto'
@@ -21,7 +21,12 @@ if [ -z "$NO_COLOR" ]; then
 fi
 
 # short aliases for commands
-alias g=git
+if [ "${NO_COLOR:-}" ]; then
+	alias git='git -c color.ui=no'
+	alias g='git -c color.ui=no'
+else
+	alias g='git'
+fi
 
 
 # Chrome remote work...

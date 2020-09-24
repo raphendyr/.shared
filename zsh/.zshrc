@@ -13,24 +13,48 @@ SAVEHIST=10000
 HISTORY_IGNORE="(ls|ls *|cd|cd..|cd ..|pwd|exit|rm -rf *)"
 HISTORY_IGNORE_SESSION="(exit|rm -rf *)"
 zshaddhistory() {
-  emulate -L zsh
-  # when HISTORY_IGNORE requires EXTENDED_GLOB syntax
-  #setopt extendedglob
-  [[ $1 != ${~HISTORY_IGNORE_SESSION} ]]
+	emulate -L zsh
+	# when HISTORY_IGNORE requires EXTENDED_GLOB syntax
+	#setopt extendedglob
+	[[ $1 != ${~HISTORY_IGNORE_SESSION} ]]
 }
+
+# Check color support
+export NO_COLOR=yes
+case "$TERM" in
+	''|dumb|vt100|xterm|xterm-old)
+		# Known no-color terminals
+		;;
+	xterm-color|*-256color)
+		# TERM can indicate a color support
+		unset NO_COLOR
+		;;
+	*)
+		# Try to detect
+		# 1) Check terminfo databas
+		# 2) If not, we can try to test with tput. If it works,
+		#    assume color support is compliant with Ecma-48 (ISO/IEC-6429).
+		if { which infocmp && infocmp && { infocmp | grep -qsF 'colors#' ; }; } >/dev/null 2>&1 \
+			|| { which tput && tput setaf 1; } >/dev/null 2>&1
+		then
+			unset NO_COLOR
+		fi
+		;;
+esac
+
 
 setopt autocd extendedglob correct interactive_comments
 unsetopt beep nomatch ignoreeof
 setopt hup # send hup to jobs on disown (exit)
 
-if [ -z "$LS_COLORS" ]; then
+if [[ -z $LS_COLORS && -z $NO_COLOR ]]; then
 	# recalculate if dircolors exists, elese use a cached entry
 	which dircolors >/dev/null && eval `dircolors -b` \
 		|| LS_COLORS='rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:'
 fi
 
 zstyle ':completion:*' completer _expand _complete
-zstyle ':completion:*' list-colors "${(@s.:.)LS_COLORS}"
+[[ $LS_COLORS ]] && zstyle ':completion:*' list-colors "${(@s.:.)LS_COLORS}"
 zstyle ':completion:*' use-cache on
 zstyle ':completion:*' cache-path "$ZSH_CACHE_DIR/zcompcache"
 zstyle ':completion:*' accept-exact '*(N)'
@@ -100,19 +124,31 @@ stty erase 
 stty intr  
 
 # PS1
-if [[ $EUID == 0 ]]; then
+if [[ $NO_COLOR ]]; then
+	PS1='%n@%m'
+elif [[ $EUID == 0 ]]; then
 	PS1='%F{red}%B%m%b%f'
 else
 	PS1='%F{green}%n%f@%F{green}%m%f'
 fi
 # full path: ':%F{cyan}%~%f'
-PS1="$PS1"':%F{cyan}%(6~|%-2~/…/%3~|%~)%f%(?.. %F{red}%B%?%b%f )%# '
+[[ $NO_COLOR ]] \
+	&& PS1="$PS1"':%(6~|%-2~/…/%3~|%~)%(?.. %? )%# ' \
+	|| PS1="$PS1"':%F{cyan}%(6~|%-2~/…/%3~|%~)%(?.. %F{red}%B%?%b )%f%# '
 if [ -r "/etc/debian_chroot" -a -s "/etc/debian_chroot" ]; then
-    PS1="(%F{yellow}$(cat /etc/debian_chroot)%f)$PS1"
+	[[ $NO_COLOR ]] \
+		&& PS1="($(cat /etc/debian_chroot))$PS1" \
+		|| PS1="(%F{yellow}$(cat /etc/debian_chroot)%f)$PS1"
 fi
-PS2='%F{magenta}%B%_%b%f> '
-PS3='%F{magenta}%B?%b%f# '
-PS4='%B%F{black}+%b%f%F{blue}%I%f:%F{cyan}%N%f:%F{blue}%i%f> '
+if [[ $NO_COLOR ]]; then
+	PS2='> '
+	PS3='?# '
+	PS4='+%N:%i> '
+else
+	PS2='%F{magenta}%B%_%b%f> '
+	PS3='%F{magenta}%B?%b%f# '
+	PS4='%B%F{black}+%b%f%F{blue}%I%f:%F{cyan}%N%f:%F{blue}%i%f> '
+fi
 # RPROMPT
 #RPS1='%1v'
 setopt transient_rprompt # remove right prompt after command is entered

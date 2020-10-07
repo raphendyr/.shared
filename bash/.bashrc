@@ -27,7 +27,10 @@ fi
 [ -r "$HOME/.aliases" ] && . "$HOME/.aliases"
 
 # Completion
-! shopt -oq posix && [ -f /etc/bash_completion ] && . /etc/bash_completion
+[ -z "${BASH_COMPLETION_VERSINFO:-}" ] \
+	&& ! shopt -oq posix \
+	&& [ -f /etc/bash_completion ] \
+	&& . /etc/bash_completion
 
 # Local changes
 [ -r "$HOME/.bashrc.local" ] && . "$HOME/.bashrc.local"

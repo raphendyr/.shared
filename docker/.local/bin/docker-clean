@@ -1,0 +1,10 @@
+#!/bin/sh
+
+docker container prune -f
+
+if [ "$1" = "-d" ]; then
+    docker image ls|awk '/^[^[:space:]]+\s+([a-zA-Z0-9.-]+[_-]|)dev\s+/ {print $3}'|xargs -r docker image rm
+fi
+docker image ls|awk '/^[^[:space:]]+\s+[a-zA-Z0-9.-]+[_-]old\s+/ {print $3}'|xargs -r docker image rm
+
+docker image prune -f

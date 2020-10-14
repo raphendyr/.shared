@@ -1,0 +1,267 @@
+#!/bin/bash
+set -e
+
+# Enable fancy features
+export DOCKER_BUILDKIT=1
+
+
+parse_services() {
+	python3 /dev/stdin "$1" "${2:-.}" "${3:-Dockerfile}" <<EOF
+from pathlib import Path
+from sys import argv
+import yaml
+with open(argv[1]) as fh:
+	data = yaml.safe_load(fh)
+context = Path(argv[2])
+dockerfile = Path(argv[3])
+for name, config in data.get('services', {}).items():
+	build = config.get('build')
+	if not build: continue
+	if isinstance(build, str):
+		if Path(build) == context and Path('Dockerfile') == dockerfile:
+			print(name)
+	elif isinstance(build, dict):
+		if Path(build.get('context')) == context and Path(build.get('dockerfile', 'Dockerfile')) == dockerfile:
+			print(name)
+EOF
+}
+
+parse_secret() {
+	case "$1" in
+		id=*|src=*) val=$1 ;;
+		*=*) val="id=${1%%=*},src=$(realpath "${1#*=}")" ;;
+		*:*) val="id=${1%%:*},src=$(realpath "${1#*:}")" ;;
+	esac
+}
+
+typeset -a args
+identifier=
+dockerfile=
+context=
+cmd=
+
+while [[ $# -gt 0 ]]; do
+	case "$1" in
+		--) shift ; break ;;
+		--tag=*) identifier=${1#*=} ;;
+		-t|--tag) identifier=$2 ; shift ;;
+		--file=*) dockerfile=${1#*=} ;;
+		-f|--file) dockerfile=$2 ; shift ;;
+		--context=*) context=${1#*=} ;;
+		-C|--context) context=$2 ; shift ;;
+		--label) args=("${args[@]}" "$1" "$2") ; shift ;;
+		--label=*) args=("${args[@]}" "$1") ;;
+		-P) args=("${args[@]}" "--progress=plain") ;;
+		--progress) args=("${args[@]}" "$1" "$2") ; shift ;;
+		--progress=*) args=("${args[@]}" "$1") ;;
+		--secret) parse_secret "$2" ; args=("${args[@]}" "$1" "$val") ; shift ;;
+		--secret=*) parse_secret "${1#*=}" ; args=("${args[@]}" "${1%%=*}" "$val") ;;
+		--no-cache) args=("${args[@]}" "$1") ;;
+		-v) args=("${args[@]}" "$1" "$(realpath "${2%%:*}"):${2#*:}") ; shift ;;
+		--*) args=("${args[@]}" "$1") ;;
+		-*) echo "Unknown option $1" >&2 ; exit 64 ;;
+		*) [[ -z $cmd ]] && cmd=$1 || break ;;
+	esac
+	shift
+done
+
+
+# Resolve critical location
+subproject=
+root=$(git rev-parse --show-toplevel 2>/dev/null || true)
+[[ $root ]] || root=$PWD
+
+if [[ $context ]]; then
+	context=$(realpath "$context")
+	if [[ $context == $PWD/* ]]; then
+		# subcontext -> use dockerfile from there
+		[[ $dockerfile ]] || dockerfile="$context/Dockerfile"
+	else
+		# parent path -> use dockerfile from here
+		[[ $dockerfile ]] || dockerfile="$PWD/Dockerfile"
+	fi
+else
+	# guess a nice context
+	context=$PWD
+	while [[ $context == $root/* ]]; do
+		if [[ -z $dockerfile && -e "$context/Dockerfile" ]]; then
+		   dockerfile="$context/Dockerfile"
+		fi
+		if [[ -e $context/.dockerignore ]]; then
+			break
+		fi
+		context=${context%/*}
+	done
+	if [[ -z $dockerfile ]]; then
+	   dockerfile="$context/Dockerfile"
+	fi
+fi
+
+dockerfile=$(realpath "$dockerfile")
+if [[ ${dockerfile%/*} == $root/* ]]; then
+	subproject=$(realpath --relative-to="$root" "${dockerfile%/*}")
+fi
+dockerfile=$(realpath --relative-to="$context" "$dockerfile")
+
+
+get_name_and_tag() {
+	identifier="${1:-${identifier:-}}"
+	name="${identifier%%:*}"
+	tag="${identifier#*:}"
+
+	if [ "$name" = "$tag" ]; then
+		# no : in indentifier, i.e, no tag (or no identifier)
+		tag='dev'
+	elif [ -z "$tag" ]; then
+		# name given, but no tag -> use latest
+		tag='latest'
+	fi
+
+	if [ -z "$name" ]; then
+		if name=$(git config --get remote.origin.url 2>/dev/null) && [ "$name" ]; then
+			name=$(echo "$name" | sed 's/\.git$//' | tr ':' '/')
+		else
+			name="${root%/}"
+			projectname="${name##*/}"
+			parentpath="${name%/*}"
+			parentname="${parentpath##*/}"
+			case "$parentname" in
+				*[A-Z]*|[0-9]*) name="$projectname" ;;
+				*) name="$parentname/$projectname" ;;
+			esac
+		fi
+		if [ "$subproject" ]; then
+			name="$name-$(echo "$subproject"|tr '/' '-')"
+		fi
+	fi
+
+	name=$(echo "$name"|rev|cut -d/ -f1-2|rev|tr 'A-Z' 'a-z'|tr ' ' '_')
+}
+
+get_compose_info() {
+	compose_file="$root/${COMPOSE_FILE:-docker-compose.yml}"
+	compose_project=
+	compose_services=
+	if [[ -e $compose_file ]]; then
+		compose_project=${COMPOSE_PROJECT_NAME:-${root##*/}}
+		compose_services=$(parse_services "$compose_file" "$(realpath --relative-to="$root" "$context")" "$dockerfile")
+	fi
+}
+
+
+build() {
+	get_name_and_tag "${1:-}"
+	cd "${context:-$root}"
+	[ -e "$dockerfile" ] || { echo "Error, missing '$dockerfile'" >&2; exit 1; }
+	echo ">> Building image '$name' with tag '$tag' from '$dockerfile'"
+
+	if [ -e hooks/build ]; then
+	    DOCKER_REPO="$name"
+		DOCKER_TAG="$tag"
+		IMAGE_NAME="$name:$tag"
+		DOCKERFILE_PATH="$dockerfile"
+		export DOCKER_REPO DOCKER_TAG IMAGE_NAME DOCKERFILE_PATH
+	    exec hooks/build
+	else
+		docker image rm "$name:${tag}-old" || true
+	    docker image tag "$name:${tag}" "$name:${tag}-old" || true
+		set -x
+		exec docker build "${args[@]}" -f "$dockerfile" -t "$name:$tag" .
+	fi
+}
+
+run() {
+	identifier="${1:-}"
+	[[ "$identifier" == *:* ]] && shift || identifier=""
+	get_name_and_tag "$identifier"
+
+	local run_cmd=() run_name=
+	get_compose_info
+	if [[ $compose_services ]]; then
+		run_cmd=("docker-compose" "-f" "$compose_file" "run" "--rm")
+		run_name=$(echo "$compose_services" | cut -d' ' -f1)
+		if [ -z "$*" ]; then
+			args=("${args[@]}" "--no-deps")
+		fi
+	else
+		run_cmd=("docker" "run" "--rm" "-it")
+		run_name="$name:$tag"
+	fi
+	if [ -z "$*" ]; then
+		args=("${args[@]}" "--entrypoint=")
+		set -- /bin/sh -c "test -x /bin/bash && exec /bin/bash -l || exec /bin/sh -l"
+	fi
+	set -x
+	exec "${run_cmd[@]}" "${args[@]}" "$run_name" "$@"
+}
+
+enter() {
+	identifier="${1:-}"
+	[[ "$identifier" == *:* ]] && shift || identifier=""
+	get_name_and_tag "$identifier"
+	[ "$tag" != "latest" ] && image="$name:$tag" || image="$name"
+
+	get_compose_info
+	if [[ $compose_services ]]; then
+		ids=$(for service in $compose_services; do docker container ls -f "name=${compose_project}_${service}*" | tail -n+2; done)
+	else
+		ids=$(docker container ls -f "ancestor=$image" | tail -n+2)
+	fi
+
+	if [ -z "$ids" ]; then
+		echo "No running containers for $image" >&2
+		exit 1
+	fi
+	ids_num=$(echo "$ids" | wc -l)
+	if [ "$ids_num" -gt 1 ]; then
+		echo "Multiple running containers for $image, please select:"
+		echo "$ids" | nl -w2 -s') '
+		printf "#? "
+		read reply
+		case "$reply" in
+			''|*[!0-9]*) echo "Invalid selection" >&2 ; exit 1 ;;
+		esac
+		if [ "$reply" -gt "$ids_num" ]; then
+			echo "Invalid selection" >&2
+			exit 1
+		fi
+		ids="$(echo "$ids" | head -n${reply} | tail -n1)"
+	fi
+	id=$(echo "$ids" | awk '{print $1}')
+	if ! [[ $id ]]; then
+		echo "Failed to select container for $name:$tag" >&2
+		exit 1
+	fi
+
+	if [ -z "$*" ]; then
+		set -- /bin/sh -c "test -x /bin/bash && exec /bin/bash -l || exec /bin/sh -l"
+	fi
+	set -x
+	exec docker exec -it "$id" "$@"
+}
+
+
+if [[ $cmd ]]; then
+	set -- "$cmd" "$@"
+fi
+case "$1" in
+	'')
+		get_name_and_tag
+		echo "${0##*/} info:"
+		echo "  image     : $name:$tag"
+		echo "  project   : $root"
+		echo "  Dockerfile: $dockerfile"
+		exit 0
+		;;
+	print-image)
+		get_name_and_tag "${2:-}"
+		echo "$name:$tag"
+		exit 0
+		;;
+	exec) shift; enter "$@" ;; # alias for enter
+	build|enter|run) "$@" ;;
+	*)
+		echo "Invalid command: $1" >&2
+		exit 64
+		;;
+esac

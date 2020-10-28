@@ -26,7 +26,7 @@ endif
 " Syntax & indent
 "
 syntax on
-set background=dark
+colorscheme n-1.fi
 set ts=4 sw=4
 set formatoptions-=tc
 
@@ -37,6 +37,7 @@ if has("autocmd")
     " Makefile sanity
     autocmd BufNewFile,BufRead ?akefile* set noet ts=4 sw=4
     autocmd BufNewFile,BufRead */debian/rules set noet ts=4 sw=4
+    autocmd BufNewFile,BufRead */debian/control* set noet ts=4 sw=4 textwidth=74 colorcolumn=75
     " Special Dockerfile matches
     autocmd BufNewFile,BufRead Dockerfile.* setf dockerfile
 endif
@@ -53,8 +54,25 @@ set showmatch       " Show matching brackets.
 set smartcase       " Do smart case matching
 
 " Keybindings
-nnoremap <silent> <Leader>w :w<CR>
+nnoremap <silent> <Leader>h :split<CR>
 nnoremap <silent> <Leader>q :q<CR>
+nnoremap <silent> <Leader>s :vsplit<CR>
+nnoremap <silent> <Leader>v :vsplit<CR>
+nnoremap <silent> <Leader>w :w<CR>
+
+" Statusline
+hi User1 cterm=None ctermfg=White ctermbg=DarkRed gui=None guifg=White guibg=DarkRed
+set laststatus=2
+set showmode
+set statusline=\ %n\ %<%f%1*%m%0*\                    " Buffer number, File path, modified
+set statusline+=%(\ %R%W\ %)                    " opt: readonly, preview
+set statusline+=\ %{&ft}                        " FileType
+set statusline+=%(,%{&fenc!='utf-8'?&fenc:''}%) " Encoding
+set statusline+=%(,%{&ff!='unix'?&ff:''}%)      " FileFormat
+set statusline+=%=                              " Right Side
+set statusline+=\ %c%V,%02l/%L\ (%P)\           " Column (-Visual column), Line / Total lines, Percentage
+" DEFAULT: set statusline=%f\ %h%w%m%r\ %=%(%l,%c%V\ %=\ %P%)
+
 
 "
 " Plugin Config
@@ -64,7 +82,7 @@ nnoremap <silent> <Leader>q :q<CR>
 let g:netrw_home = g:vim_cache_dir
 let g:netrw_liststyle = 3
 let g:netrw_nogx = 1
-nnoremap <silent> <Leader>o :Lexplore<CR>
+nnoremap <silent> <Leader>o :Explore!<CR>
 
 " Better Whitespace
 let g:better_whitespace_ctermcolor='DarkGreen'

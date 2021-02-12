@@ -64,13 +64,14 @@ nnoremap <silent> <Leader>w :w<CR>
 hi User1 cterm=None ctermfg=White ctermbg=DarkRed gui=None guifg=White guibg=DarkRed
 set laststatus=2
 set showmode
-set statusline=\ %n\ %<%f%1*%m%0*\                    " Buffer number, File path, modified
-set statusline+=%(\ %R%W\ %)                    " opt: readonly, preview
-set statusline+=\ %{&ft}                        " FileType
-set statusline+=%(,%{&fenc!='utf-8'?&fenc:''}%) " Encoding
-set statusline+=%(,%{&ff!='unix'?&ff:''}%)      " FileFormat
-set statusline+=%=                              " Right Side
-set statusline+=\ %c%V,%02l/%L\ (%P)\           " Column (-Visual column), Line / Total lines, Percentage
+let &statusline  = ' %n %<%f '                          " Buffer number, File path, modified
+let &statusline .= '%1*%{&ma && &mod?"[+]":""}%0*'      " highlighted modified tag
+let &statusline .= ' %( %R%W %)'                        " opt: readonly, preview
+let &statusline .= ' %{&ft}'                            " FileType
+let &statusline .= '%(,%{&fenc!="utf-8"?&fenc:""}%)'    " Encoding
+let &statusline .= '%(,%{&ff!="unix"?&ff:""}%)'         " FileFormat
+let &statusline .= '%='                                 " Right Side
+let &statusline .= ' %c%V,%02l/%L (%P) '                " Column (-Visual column), Line / Total lines, Percentage
 " DEFAULT: set statusline=%f\ %h%w%m%r\ %=%(%l,%c%V\ %=\ %P%)
 
 

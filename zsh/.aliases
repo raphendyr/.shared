@@ -29,6 +29,15 @@ else
 fi
 
 
+# defaults for pwqgen
+if which pwqgen >/dev/null; then
+	pwqgen() {
+		if [ -z "$*" ]; then set -- random=64 ; fi
+		command pwqgen "$@";
+	}
+fi
+
+
 # Chrome remote work...
 if which chromium >/dev/null; then
 	alias chromium-temp="chromium --temp-profile"

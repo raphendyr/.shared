@@ -10,6 +10,9 @@
 [submodule "vim/.vim/_git/vim-elixir"]
 	path = vim/.vim/_git/vim-elixir
 	url = https://github.com/elixir-editors/vim-elixir.git
+[submodule "vim/.vim/_git/vim-json5"]
+	path = vim/.vim/_git/vim-json5
+	url = https://github.com/gutenye/json5.vim.git
 [submodule "vim/.vim/_git/vim-vinegar"]
 	path = vim/.vim/_git/vim-vinegar
 	url = https://github.com/tpope/vim-vinegar.git

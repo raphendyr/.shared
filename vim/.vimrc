@@ -61,11 +61,22 @@ nnoremap <silent> <Leader>v :vsplit<CR>
 nnoremap <silent> <Leader>w :w<CR>
 
 " Statusline
+function! LinterStatus() abort
+    let l:counts = ale#statusline#Count(bufnr(''))
+    let l:errors = l:counts.error + l:counts.style_error
+    let l:warnings = l:counts.total - l:errors
+    return ''
+    \ . warnings > 0 ? printf('%dW', warnings) : ''
+    \ . warnings > 0 && errors > 0 ? ' ' : ''
+    \ . errors > 0 ? printf('%dE', errors) : ''
+endfunction
+
 hi User1 cterm=None ctermfg=White ctermbg=DarkRed gui=None guifg=White guibg=DarkRed
 set laststatus=2
 set showmode
 let &statusline  = ' %n %<%f '                          " Buffer number, File path, modified
 let &statusline .= '%1*%{&ma && &mod?"[+]":""}%0*'      " highlighted modified tag
+let &statusline .= '%(%1* %{LinterStatus()} %0*%)'       " Linter problems
 let &statusline .= ' %( %R%W %)'                        " opt: readonly, preview
 let &statusline .= ' %{&ft}'                            " FileType
 let &statusline .= '%(,%{&fenc!="utf-8"?&fenc:""}%)'    " Encoding
@@ -84,6 +95,12 @@ let g:netrw_home = g:vim_cache_dir
 let g:netrw_liststyle = 3
 let g:netrw_nogx = 1
 nnoremap <silent> <Leader>o :Explore!<CR>
+
+" ALE
+let g:ale_echo_msg_format = '[%linter%] %s [%severity%]'
+let g:ale_sign_error = '✘'
+let g:ale_sign_warning = '‼'
+let g:ale_lint_on_text_changed = 'never'
 
 " Better Whitespace
 let g:better_whitespace_ctermcolor='DarkGreen'

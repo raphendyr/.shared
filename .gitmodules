@@ -1,6 +1,9 @@
 [submodule "vim/.vim/_git/editorconfig-vim"]
 	path = vim/.vim/_git/editorconfig-vim
 	url = https://github.com/editorconfig/editorconfig-vim.git
+[submodule "vim/.vim/_git/vim-ale"]
+	path = vim/.vim/_git/vim-ale
+	url = https://github.com/dense-analysis/ale.git
 [submodule "vim/.vim/_git/vim-better-whitespace"]
 	path = vim/.vim/_git/vim-better-whitespace
 	url = https://github.com/ntpeters/vim-better-whitespace.git

@@ -21,5 +21,10 @@ hi TabLineFill cterm=NONE ctermfg=White ctermbg=DarkGray gui=NONE guifg=White gu
 " :ter[minal] mode
 hi StatusLineTerm term=bold,reverse cterm=NONE ctermfg=Black ctermbg=DarkGreen gui=NONE guifg=White guibg=DarkGreen
 hi StatusLineTermNC term=bold,reverse cterm=NONE ctermfg=White ctermbg=DarkGray gui=NONE guifg=White guibg=DarkGray
+" Left side columns
+hi LineNr term=NONE ctermfg=Gray ctermbg=Black
+hi clear SignColumn
+hi ALEErrorSign term=NONE ctermfg=Red ctermbg=Black
+hi ALEWarningSign term=NONE ctermfg=Yellow ctermbg=Black
 
 " vim: tw=0 ts=2 sw=2 et

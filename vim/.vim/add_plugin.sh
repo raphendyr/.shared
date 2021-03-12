@@ -13,7 +13,7 @@ fi
 plugin="_git/$plugin_name"
 
 if ! [ -e "$plugin" ]; then
-	git submodule add "$url" "$plugin"
+	git submodule add --depth 1 "$url" "$plugin"
 fi
 
 for dir in \

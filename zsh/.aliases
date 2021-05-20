@@ -28,6 +28,10 @@ else
 	alias g='git'
 fi
 
+# use octave for octave-cli in shell
+if which octave-cli >/dev/null; then
+	alias octave='octave-cli'
+fi
 
 # defaults for pwqgen
 if which pwqgen >/dev/null; then

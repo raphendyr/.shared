@@ -166,6 +166,7 @@ if [[ -d "$ZSH/plugins" ]]; then
 	for _plugin in \
 		my-title \
 		my-git-info \
+		my-virtualenv \
 		my-docker-info \
 		dotenv \
 		my-jobs-info \

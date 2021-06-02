@@ -173,6 +173,7 @@ if [[ -d "$ZSH/plugins" ]]; then
 		zsh-autosuggestions \
 		zsh-syntax-highlighting \
 		fzf \
+		my-downloadable \
 	; do
 		_path="$ZSH/plugins/$_plugin/$_plugin.zsh"
 		if [[ -f $_path ]]; then

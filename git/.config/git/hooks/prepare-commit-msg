@@ -21,20 +21,22 @@ case "$msg_type" in
 esac
 
 group_grep() {
+	#python -c 'import sys
+	#data = {}
+	#for line in sys.stdin:
+	#    f, l, c = line.strip().split(":", 2)
+	#    data.setdefault(f, []).append((int(l), c.strip()))
+	#for f in sorted(data):
+	#    print(f)
+	#    for l, c in sorted(data[f]):
+	#        print("  %4d: %s" % (l, c))' -
 	awk -F: '
 {
-  f=$1; l=$2;
-  $1=""; $2="";
-  arr[f][l] = $0
-}
-END {
-  for (f in arr) {
-    print f;
-    for (l in arr[f]) {
-      gsub(/^\s*/, "", arr[f][l]);
-      printf("  %4d: %s\n", l, arr[f][l]);
-    }
-  }
+  if ($1 != prev) print $1;
+  prev = $1; $1 = "";
+  ln = $2; $2 = "";
+  gsub(/^[[:space:]]*/, "");
+  printf("  %4d: %s\n", ln, $0);
 }'
 }
 

@@ -1,0 +1,1 @@
+../_git/vim-jsonnet/plugin/jsonnet.vim

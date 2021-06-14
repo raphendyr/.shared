@@ -30,16 +30,16 @@ function +vi-git-st() {
 
 	# ahead/behind
 	ahead=$(git rev-list ${hook_com[branch]}@{upstream}..HEAD 2>/dev/null | wc -l)
-	(( $ahead )) && gitstatus+=( "+${ahead}" )
+	(( $ahead )) && gitstatus+=( "+${ahead//[[:space:]]}" )
 	behind=$(git rev-list HEAD..${hook_com[branch]}@{upstream} 2>/dev/null | wc -l)
-	(( $behind )) && gitstatus+=( "-${behind}" )
+	(( $behind )) && gitstatus+=( "-${behind//[[:space:]]}" )
 	hook_com[misc]+=${(j:/:)gitstatus}
 
 	# stashes
 	#stashes=$(git stash list 2>/dev/null | wc -l)
 	stashes="${hook_com[base]}/.git/logs/refs/stash"
 	stashes=$(test -e "$stashes" && wc -l < "$stashes")
-	(( $stashes )) && hook_com[unstaged]="@$stashes"
+	(( $stashes )) && hook_com[unstaged]="@${stashes//[[:space:]]}"
 
 	# remember git root
 	gr=$(realpath "--relative-to=$PWD" "${hook_com[base]}" 2>/dev/null)

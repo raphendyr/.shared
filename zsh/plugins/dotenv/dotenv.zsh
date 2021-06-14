@@ -35,7 +35,7 @@ _ZSH_DOTENV_STACK_TOP_WD=
 			esac
 			shift
 		done
-		printf "%s %s\n" "${(%)ps}" "$(sed 's/\(PASSWORD\|SECRET\|TOKEN\)=\('"'[^']*'"'\|"[^"]*"\|[^[:space:]"'\'']*\)/\1= [hidden] /g' <<< "$*")"
+		printf "%s %s\n" "${(%)ps}" "$(sed -E 's/(PASSWORD|SECRET|TOKEN)=('"'[^']*'"'|"[^"]*"|[^[:space:]"'\'']*)/\1= [hidden] /g' <<< "$*")"
 	fi
 }
 
@@ -146,9 +146,9 @@ _ZSH_DOTENV_STACK_TOP_WD=
 	local -a match mbegin mend
 	while read -r line; do
 		(( linenum++ ))
-		[[ $line =~ '^\s*#.*' ]] && continue
+		[[ $line =~ '^[[:space:]]*#.*' ]] && continue
 		#line=(${(Az)line})
-		if [[ $line =~ '^alias\s+' ]]; then
+		if [[ $line =~ '^alias[[:space:]]+' ]]; then
 			for word (${(Az)line}); do
 				[[ $word = 'alias' ]] && continue
 				if ! [[ $word =~ '^[A-Za-z_][A-Za-z0-9_-]*=' ]]; then
@@ -166,10 +166,10 @@ _ZSH_DOTENV_STACK_TOP_WD=
 					+dotenv-debug "N=$ZSH_DOTENV_FILE" "i=$linenum" "I=$dotenv_num" -- "$value"
 					eval "$value"
 				else
-					+dotenv-debug "N=$ZSH_DOTENV_FILE" "i=$linenum" "I=$dotenv_num" -- "Invalid line: $line" >&2
+					+dotenv-debug "N=$ZSH_DOTENV_FILE" "i=$linenum" "I=$dotenv_num" -- "Invalid alias: $line" >&2
 				fi
 			done
-		elif [[ $line =~ '^(export\s+)?([A-Za-z_][A-Za-z0-9_]*)=' ]]; then
+		elif [[ $line =~ '^(export[[:space:]]+)?([A-Za-z_][A-Za-z0-9_]*)=' ]]; then
 			name=${match[2]}
 			if value=$(eval "$line"; export "$name"; declare -p -- "$name") 2>/dev/null; then
 				if [[ ${(P)name+x} ]]; then
@@ -181,7 +181,7 @@ _ZSH_DOTENV_STACK_TOP_WD=
 				+dotenv-debug "N=$ZSH_DOTENV_FILE" "i=$linenum" "I=$dotenv_num" -- "$value"
 				eval "$value"
 			else
-				+dotenv-debug "N=$ZSH_DOTENV_FILE" "i=$linenum" "I=$dotenv_num" -- "Invalid line: $line" >&2
+				+dotenv-debug "N=$ZSH_DOTENV_FILE" "i=$linenum" "I=$dotenv_num" -- "Invalid variable: $line" >&2
 			fi
 		else
 			+dotenv-debug "N=$ZSH_DOTENV_FILE" "i=$linenum" "I=$dotenv_num" -- "Invalid line: $line" >&2

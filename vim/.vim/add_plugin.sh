@@ -28,14 +28,14 @@ for dir in \
 	plugin \
 	syntax \
 ; do
-	if [ -e "$plugin/$dir/" ]; then
-		find "$plugin/$dir/" -type f | while read file; do
+	if [ -e "$plugin/$dir" ]; then
+		find "$plugin/$dir" -type f | while read file; do
 			path="${file#$plugin/}"
 			path_dir="${path%/*}"
-			path_rev=$(echo $path_dir | sed 's,[^/]\+,..,g')
+			path_rev=$(echo "$path_dir" | sed 's,[^/][^/]*,..,g')
 			if ! [ -e "$path" ]; then
 				mkdir -p "$path_dir"
-				ln -vsT "$path_rev/$file" "$path"
+				ln -vs "$path_rev/$file" "$path"
 			fi
 		done
 	fi

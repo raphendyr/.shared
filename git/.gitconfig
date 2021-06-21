@@ -5,6 +5,7 @@
 	lol = !git log --graph --decorate --pretty=oneline --abbrev-commit --all || true
 	ls-ignored = ls-files -o -i --exclude-standard
 	s = status --short
+	st = status
 [color]
 	ui = auto
 [core]

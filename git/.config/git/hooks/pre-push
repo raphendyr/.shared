@@ -1,17 +1,44 @@
 #!/bin/sh -eu
 
-remote="$1"
-url="$2"
+remote=$1
+url=$2
 
-scripts=$(dirname "$0")
+scripts=${0%/*}
 z40=0000000000000000000000000000000000000000
 
 while read local_ref local_sha remote_ref remote_sha; do
-	if [ "$local_sha" = $z40 ]; then
+	if [ "$local_sha" = "$z40" ]; then
 		# Handle delete
 		:
 	else
-		if [ "$remote_sha" = $z40 ]; then
+		if [ "$remote_sha" = "$z40" ]; then
+			# trye to resolve remote HEAD, i.e., top of default branch
+			remote_head=$(git rev-parse --verify "$remote/HEAD" 2>/dev/null || true)
+			if [ -z "$remote_head" ]; then
+				for some_remote in $(git remote); do
+					if [ "$some_remote" != "$remote" ]; then
+						remote_head=$(git rev-parse --verify "$some_remote/HEAD" 2>/dev/null || true)
+					fi
+				done
+			fi
+			if [ "$remote_head" ]; then
+				# if we have any remote/HEAD, then find merge-base
+				remote_sha=$(git merge-base "$remote_head" "$local_sha" 2>/dev/null || true)
+			else
+				# if there is no HEAD, then one is probably removed
+				remote_parent=$(\
+					git log --decorate --simplify-by-decoration --oneline \
+					| grep -vF "(HEAD" \
+					| cut -d '(' -f 2 | cut -d ')' -f 1 \
+					| tr ',' '\n' | tr -d ' ' \
+					| grep "^$remote/" \
+					| head -n1)
+				if [ "$remote_parent" ]; then
+					remote_sha=$(git rev-parse --verify "$remote_parent" 2>/dev/null || true)
+				fi
+			fi
+		fi
+		if [ -z "$remote_sha" -o "$remote_sha" = "$z40" ]; then
 			# New branch, examine all commits
 			range="$local_sha"
 		else
@@ -26,10 +53,12 @@ while read local_ref local_sha remote_ref remote_sha; do
 		fi
 
 		# Check for WIP commit
-		commit=$(git rev-list -n 1 -i --grep '^WIP' "$range")
+		set -- -i --grep '^WIP'
+		set -- "$@" --grep '^fixup! '
+		commit=$(git rev-list -n 1 "$@" "$range")
 		if [ -n "$commit" ]; then
 			echo "Found WIP commit(s) in $local_ref" >&2
-			git log --pretty=oneline --abbrev-commit --decorate --color -i --grep '^WIP' "$range" | sed 's/^/  /' >&2
+			git log --pretty=oneline --abbrev-commit --decorate --color "$@" "$range" | sed 's/^/  /' >&2
 			if [ "${ALLOW_WIP:-no}" != "yes" ]; then
 				echo "Push rejected, set ALLOW_WIP=yes to ignore this check" >&2
 				exit 1

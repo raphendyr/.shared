@@ -33,6 +33,17 @@ if which octave-cli >/dev/null; then
 	alias octave='octave-cli'
 fi
 
+# bat utilities
+if command -v bat >/dev/null; then
+	if command -v fzf >/dev/null; then
+		bat-preview-themes() {
+			local bat_theme
+			bat_theme=$(bat --list-themes | fzf --preview='bat --theme={} --color=always .drone.jsonnet')
+			echo "set BAT_THEME='$bat_theme'"
+		}
+	fi
+fi
+
 # defaults for pwqgen
 if which pwqgen >/dev/null; then
 	pwqgen() {

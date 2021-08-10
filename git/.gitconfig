@@ -1,6 +1,9 @@
 [alias]
 	a = add
+	c = checkout
 	d = diff
+	dc = diff --cached
+	fix = commit --fixup
 	l = !git log --graph --decorate --pretty=oneline --abbrev-commit --all || true
 	lol = !git log --graph --decorate --pretty=oneline --abbrev-commit --all || true
 	ls-ignored = ls-files -o -i --exclude-standard

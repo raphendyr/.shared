@@ -4,7 +4,7 @@
 export DEBEMAIL=jaakko@n-1.fi
 export LIBVIRT_DEFAULT_URI="qemu:///system"
 
-if which vim >/dev/null; then
+if command -v vim >/dev/null; then
 	export EDITOR=vim
 	export VISUAL=vim
 fi
@@ -30,7 +30,7 @@ for d in "bin" ".bin" ".local/bin"; do
 done
 
 # add software specific paths
-if which ruby > /dev/null; then
+if command -v ruby > /dev/null; then
 	ruby_ver="$(ruby --version | cut -d' ' -f2 | cut -d. -f1-2).0"
 	for d in ".gem/ruby" ".local/lib/Homebrew/lib/ruby/gems"; do
 		add_path "$HOME/$d/$ruby_ver/bin" append
@@ -38,7 +38,7 @@ if which ruby > /dev/null; then
 	unset ruby_ver
 fi
 
-if which python3 > /dev/null; then
+if command -v python3 > /dev/null; then
 	python_ver="$(python3 --version | cut -d' ' -f2 | cut -d. -f1-2)"
 	for d in "Library/Python"; do
 		add_path "$HOME/$d/$python_ver/bin" append

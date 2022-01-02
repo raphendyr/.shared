@@ -119,7 +119,7 @@ for _binary in \
 	kubectl \
 	minikube \
 ; do
-	if ! which "$_binary" >/dev/null; then
+	if ! command -v "$_binary" >/dev/null; then
 		function "$_binary"() {
 			if +my-downloadable "$0"; then
 				unset -f "$0"

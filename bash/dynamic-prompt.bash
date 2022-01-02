@@ -13,8 +13,8 @@ case "$TERM" in
 		# 1) Check terminfo databas
 		# 2) If not, we can try to test with tput. If it works,
 		#    assume color support is compliant with Ecma-48 (ISO/IEC-6429).
-		if { which infocmp && infocmp && { infocmp | grep -qsF 'colors#' ; }; } >&/dev/null \
-			|| { which tput && tput setaf 1; } >&/dev/null
+		if { command -v infocmp && infocmp && { infocmp | grep -qsF 'colors#' ; }; } >&/dev/null \
+			|| { command -v tput && tput setaf 1; } >&/dev/null
 		then
 			unset NO_COLOR
 		fi

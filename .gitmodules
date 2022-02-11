@@ -19,6 +19,9 @@
 [submodule "vim/.vim/_git/vim-jsonnet"]
 	path = vim/.vim/_git/vim-jsonnet
 	url = https://github.com/google/vim-jsonnet
+[submodule "vim/.vim/_git/vim-terraform"]
+	path = vim/.vim/_git/vim-terraform
+	url = https://github.com/hashivim/vim-terraform
 [submodule "vim/.vim/_git/vim-vinegar"]
 	path = vim/.vim/_git/vim-vinegar
 	url = https://github.com/tpope/vim-vinegar.git

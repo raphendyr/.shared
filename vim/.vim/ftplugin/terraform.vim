@@ -1,0 +1,1 @@
+../_git/vim-terraform/ftplugin/terraform.vim

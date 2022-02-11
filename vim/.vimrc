@@ -40,6 +40,8 @@ if has("autocmd")
     autocmd BufNewFile,BufRead */debian/control* set noet ts=4 sw=4 textwidth=74 colorcolumn=75
     " Special Dockerfile matches
     autocmd BufNewFile,BufRead Dockerfile.* setf dockerfile
+    " Some json files are really json5 files
+    autocmd BufNewFile,BufRead tsconfig.json set ft=json5 ts=2 sw=2
 endif
 
 " Fancy features
@@ -48,6 +50,7 @@ set autowrite       " Automatically save before commands like :next and :make
 set ignorecase      " Do case insensitive matching
 set incsearch       " Incremental search
 set modeline        " Parse vim modelines
+set modelines=4
 "set mouse=a         " Enable mouse usage (all modes) in terminals
 set showcmd         " Show (partial) command in status line.
 set showmatch       " Show matching brackets.
@@ -90,6 +93,9 @@ let &statusline .= ' %c%V,%02l/%L (%P) '                " Column (-Visual column
 " Plugin Config
 "
 
+" set regex engine, 0=auto
+set regexpengine=0
+
 " netrw + vinegar
 let g:netrw_home = g:vim_cache_dir
 let g:netrw_liststyle = 3
@@ -97,7 +103,7 @@ let g:netrw_nogx = 1
 nnoremap <silent> <Leader>o :Explore!<CR>
 
 " ALE
-let g:ale_echo_msg_format = '[%linter%] %s [%severity%]'
+let g:ale_echo_msg_format = '[%linter%] %s [%severity%] %code%'
 let g:ale_sign_error = '✘'
 let g:ale_sign_warning = '‼'
 let g:ale_lint_on_text_changed = 'never'

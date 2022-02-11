@@ -59,19 +59,28 @@ while read local_ref local_sha remote_ref remote_sha; do
 		if [ -n "$commit" ]; then
 			echo "Found WIP commit(s) in $local_ref" >&2
 			git log --pretty=oneline --abbrev-commit --decorate --color "$@" "$range" | sed 's/^/  /' >&2
-			if [ "${ALLOW_WIP:-no}" != "yes" ]; then
-				echo "Push rejected, set ALLOW_WIP=yes to ignore this check" >&2
-				exit 1
-			fi
+			case "${ALLOW_WIP:-no}" in
+				y|yes|true|1)
+					;;
+				*)
+					echo "Push rejected, set ALLOW_WIP=yes to ignore this check" >&2
+					exit 1
+					;;
+			esac
 		fi
 
 		# Reject if there are commit warnings
 		if [ "$local_sha" = "$(git rev-parse HEAD)" ] \
-		&& ! "$scripts/prepare-commit-msg" "" pre-push "$range" >&2 \
-		&& [ "${ALLOW_FIXME:-no}" != "yes" ] \
-		; then
-			echo "Push rejected, set ALLOW_FIXME=yes to ignore this check" >&2
-			exit 1
+			&& ! "$scripts/prepare-commit-msg" "" pre-push "$range" >&2
+		then
+			case "${ALLOW_FIXME:-no}" in
+				y|yes|true|1)
+					;;
+				*)
+					echo "Push rejected, set ALLOW_FIXME=yes to ignore this check" >&2
+					exit 1
+					;;
+			esac
 		fi
 	fi
 done

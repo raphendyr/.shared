@@ -38,7 +38,7 @@ else
 fi
 
 # - add debian_chroot
-if [ -r "/etc/debian_chroot" -a -s "/etc/debian_chroot" ]; then
+if [[ -r "/etc/debian_chroot" && -s "/etc/debian_chroot" ]]; then
 	if [[ $NO_COLOR ]]; then
 		# ( $/etc/debian_chroot_chroot ) $ps1
 		__build_prompt_pre="($(cat /etc/debian_chroot))$__build_prompt_pre"

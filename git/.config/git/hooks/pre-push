@@ -56,7 +56,7 @@ while read local_ref local_sha remote_ref remote_sha; do
 		set -- -i --grep '^WIP'
 		set -- "$@" --grep '^fixup! '
 		commit=$(git rev-list -n 1 "$@" "$range")
-		if [ -n "$commit" ]; then
+		if [ "$commit" ] && [ "x${remote_ref%%refs/heads/WIP*}" != 'x' ]; then
 			echo "Found WIP commit(s) in $local_ref" >&2
 			git log --pretty=oneline --abbrev-commit --decorate --color "$@" "$range" | sed 's/^/  /' >&2
 			case "${ALLOW_WIP:-no}" in

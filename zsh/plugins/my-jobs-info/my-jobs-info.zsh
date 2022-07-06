@@ -18,6 +18,10 @@ add-zsh-hook precmd +my-add-jobs-to-RPS
 
 function +my-add-jobs-trap-CHLD() {
 	setopt localoptions
+	# skip prompt update in subshells
+	if [[ ${ZSH_SUBSHELL:-0} -gt 0 ]]; then
+		return
+	fi
 	local fn
 	# reexecute precmd hooks
 	for fn (precmd $precmd_functions); do

@@ -82,6 +82,9 @@ case $TERM in
 			print -Pn "\ek$1\e\\"
 		}
 		;;
+	*)
+		+my-title-set() {}
+		;;
 esac
 
 

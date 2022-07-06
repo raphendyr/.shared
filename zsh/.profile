@@ -19,17 +19,20 @@ add_path() {
 	[ "$2" = "append" ] && PATH="$PATH:$1" || PATH="$1:$PATH"
 }
 
-# add Homebrew paths
-for d in "bin" "opt/ruby/bin" "opt/python/bin"; do
-	add_path "$HOME/.local/lib/Homebrew/$d"
-done
-
 # add private binary paths
-for d in "bin" ".bin" ".local/bin"; do
-	add_path "$HOME/$d"
-done
+add_path "$HOME/bin"
+add_path "$HOME/.bin"
+add_path "$HOME/.local/bin"
+
+# add Homebrew paths
+add_path "$HOME/.local/lib/Homebrew/bin"
+add_path "$HOME/.local/lib/Homebrew/opt/openssl@3/bin" prepend
+add_path "$HOME/.local/lib/Homebrew/opt/python/bin"
+add_path "$HOME/.local/lib/Homebrew/opt/ruby/bin"
 
 # add software specific paths
+add_path "$HOME/go/bin"
+
 if command -v ruby > /dev/null; then
 	ruby_ver="$(ruby --version | cut -d' ' -f2 | cut -d. -f1-2).0"
 	for d in ".gem/ruby" ".local/lib/Homebrew/lib/ruby/gems"; do
@@ -46,7 +49,7 @@ if command -v python3 > /dev/null; then
 	unset python_ver
 fi
 
-unset d
+
 unset -f add_path
 
 [ -f "$HOME/.profile.local" ] && . "$HOME/.profile.local"

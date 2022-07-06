@@ -3,10 +3,13 @@
 	c = checkout
 	d = diff
 	dc = diff --cached
+	f = fetch
 	fix = commit --fixup
+	fp = fetch --prune
 	l = !git log --graph --decorate --pretty=oneline --abbrev-commit --all || true
 	lol = !git log --graph --decorate --pretty=oneline --abbrev-commit --all || true
 	ls-ignored = ls-files -o -i --exclude-standard
+	p = push
 	s = status --short
 	st = status
 [color]

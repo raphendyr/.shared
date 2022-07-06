@@ -55,13 +55,14 @@ if command -v fdfind >/dev/null || command -v fd >/dev/null; then
 	}
 
 	# **<TAB>
-	FZF_DEFAULT_COMMAND="$FZF_FD_COMMAND"
+	FZF_DEFAULT_COMMAND="command $FZF_FD_COMMAND"
 	# ^R = Search history
 	# ^T = Paste selected file to the command line
-	FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND -t f --"
-	FZF_CTRL_T_OPTS="-m $FZF_FILE_PREVIEW_OPTS"
+	FZF_CTRL_T_COMMAND="command $FZF_FD_COMMAND -t f --"
+	FZF_CTRL_T_OPTS="$FZF_FILE_PREVIEW_OPTS"
 	# ALT-C = cd into the selected directory
-	FZF_ALT_C_COMMAND="$FZF_DEFAULT_COMMAND -H -E .git -E __pycache__ -E venv -t d --"
+	FZF_ALT_C_COMMAND="command $FZF_FD_COMMAND -H -E .git -E __pycache__ -E venv -t d --"
+	FZF_ALT_C_OPTS="" # TODO: directory preview
 fi
 
 # Git integration

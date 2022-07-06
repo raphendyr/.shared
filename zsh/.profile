@@ -1,6 +1,7 @@
 # ~/.profile
 #umask 022
 
+export AWS_ASSUME_ROLE_TTL=1h
 export DEBEMAIL=jaakko@n-1.fi
 export LIBVIRT_DEFAULT_URI="qemu:///system"
 

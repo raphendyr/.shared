@@ -11,10 +11,14 @@ if [[ $NO_COLOR ]]; then
 	FZF_DEFAULT_OPTS='--layout=reverse --no-color'
 	BAT_COLOR_OPTS='--color=never'
 	GIT_COLOR_OPTS='--color=never'
+	GIT_COLOR_VALUE='never'
+	LS_COLOR_OPTS=''
 else
 	FZF_DEFAULT_OPTS='--layout=reverse --ansi'
 	BAT_COLOR_OPTS='--color=always'
 	GIT_COLOR_OPTS='--color=always'
+	GIT_COLOR_VALUE='always'
+	LS_COLOR_OPTS="-FG"
 fi
 
 FZF_PREVIEW_OPTS="--bind \
@@ -25,9 +29,11 @@ ctrl-y:preview-up,ctrl-e:preview-down,\
 shift-up:preview-page-up,shift-down:preview-page-down,\
 home:preview-top,end:preview-bottom"
 if command -v bat >/dev/null; then
-	FZF_FILE_PREVIEW_OPTS="$FZF_PREVIEW_OPTS --preview 'bat $BAT_COLOR_OPTS --style=numbers --line-range=:200 {}'"
+	FZF_FILE_PREVIEW_CMD="bat $BAT_COLOR_OPTS --style=numbers --line-range=:200"
+	FZF_FILE_PREVIEW_OPTS="$FZF_PREVIEW_OPTS --preview '$FZF_FILE_PREVIEW_CMD {}'"
 else
-	FZF_FILE_PREVIEW_OPTS="$FZF_PREVIEW_OPTS --preview 'head -n200 {}'"
+	FZF_FILE_PREVIEW_CMD="head -n200"
+	FZF_FILE_PREVIEW_OPTS="$FZF_PREVIEW_OPTS --preview '$FZF_FILE_PREVIEW_CMD {}'"
 fi
 
 
@@ -76,11 +82,12 @@ if command -v git >/dev/null; then
 		local ret=0 out
 		if _fzf_is_git_repo; then
 			out=$(
-				git -c color.status=always status --short \
+				git -c color.status=$GIT_COLOR_VALUE status --short --no-renames \
 				| fzf ${=FZF_DEFAULT_OPTS} --height 40% --multi --nth 2..,.. \
-					${=FZF_PREVIEW_OPTS} --preview='git diff --color=always -- {-1} | sed 1,4d' \
+					${=FZF_PREVIEW_OPTS} \
+					--preview="read -r s f <<< {}; f=\${(Q)f}; if [[ \$s = '??' ]]; then if [[ -d \$f ]]; then ls $LS_COLOR_OPTS -1 -- \$f; else $FZF_FILE_PREVIEW_CMD -- \$f; fi; else git diff ${=GIT_COLOR_OPTS} -- \$f | sed 1,4d; fi" \
 				| cut -c4-
-				# | sed 's/.* -> //'
+				# | sed 's/.* -> //' ## select destination of renames
 			)
 			ret=$?
 			LBUFFER+=$out
@@ -96,11 +103,11 @@ if command -v git >/dev/null; then
 		local ret=0 out
 		if _fzf_is_git_repo; then
 			out=$(
-				git branch -a -vv --color=always | grep -v '/HEAD\s' \
+				git branch -a ${=GIT_COLOR_OPTS} | grep -v '/HEAD\s' \
 				| fzf ${=FZF_DEFAULT_OPTS} --height 40% --multi --tac \
 					--preview-window right:70% ${=FZF_PREVIEW_OPTS} \
-					--preview 'git log --oneline --graph --date=short --color=always --pretty="format:%C(auto)%cd %h%d %s" $(cut -c2- <<< {} | cut -d" " -f1)' \
-				| sed 's/^..//' | cut -d' ' -f1 | sed 's#^remotes/[^/]*/##'
+					--preview "git log -48 --oneline --graph --date=short ${=GIT_COLOR_OPTS} --pretty='format:%C(bold blue)%cd %C(auto)%h%d %s' \$(sed -e 's/^\*//' -e 's/^[[:space:]]*//' <<< {})" \
+				| sed -e 's/^\*//' -e 's/^[[:space:]]*//' -e 's#^remotes/[^/]*/##'
 			)
 			ret=$?
 			LBUFFER+=$out
@@ -131,15 +138,16 @@ if command -v git >/dev/null; then
 	bindkey '^gt'   _fzf_git_tags
 
 	_fzf_git_hashes() {
+		# TODO: add support for selecting multiple hashes
 		setopt localoptions pipefail no_aliases 2>/dev/null
 		local ret=0 out
 		if _fzf_is_git_repo; then
 			out=$(
-				git log ${=GIT_COLOR_OPTS} --date=short --format="%C(green)%C(bold)%cd %C(auto)%h%d %s (%an)" --graph \
-				| fzf ${=FZF_DEFAULT_OPTS} --height 40% --multi --no-sort \
+				git log ${=GIT_COLOR_OPTS} --date=short --format="%C(bold blue)%cd %C(auto)%h%d %s %C(green)[%an]" --graph \
+				| fzf ${=FZF_DEFAULT_OPTS} --height 40% --no-sort \
 					${=FZF_PREVIEW_OPTS} \
-					--preview "git show $GIT_COLOR_OPTS \$(grep -o '[a-f0-9]\\{7,\\}' <<< {})" \
-				| grep -o '[a-f0-9]\{7,\}'
+					--preview "git show ${=GIT_COLOR_OPTS} \$(grep -o '[a-f0-9]\\{7,\\}' <<< {} | head -1)" \
+				| grep -o '[a-f0-9]\{7,\}' | head -1
 			)
 			ret=$?
 			LBUFFER+=$out
@@ -158,7 +166,7 @@ if command -v git >/dev/null; then
 				git remote -v | awk '{print $1 "\t" $2}' | uniq \
 				| fzf ${=FZF_DEFAULT_OPTS} --height 40% --tac \
 					${=FZF_PREVIEW_OPTS} \
-					--preview 'git log --oneline --graph --date=short --pretty="format:%C(auto)%cd %h%d %s" {1}' \
+					--preview "git log -128 ${=GIT_COLOR_OPTS} --oneline --graph --date=short --pretty='format:%C(bold blue)%cd %C(auto)%h%d %s' {1}" \
 				| cut -f1
 			)
 			ret=$?
@@ -191,12 +199,20 @@ if command -v git >/dev/null; then
 
 	git-history() {
 		setopt localoptions pipefail no_aliases 2>/dev/null
-		local ret=0 out
+		local ret=0 out relative=x
+		while [[ $# -gt 0 ]]; do
+			case "$1" in
+				-r) relative=x ;;
+				-R) relative= ;;
+			esac
+			shift
+		done
 		out=$(
-			git log ${=GIT_COLOR_OPTS} --graph --decorate --pretty=oneline --abbrev-commit --all \
+			git log ${=GIT_COLOR_OPTS} --graph --decorate --abbrev-commit --all \
+				--pretty='format:%C(auto)%h %d %s %C(green)[%an] %C(bold blue)%ad' ${relative:+--date=relative} \
 			| fzf ${=FZF_DEFAULT_OPTS} --no-sort \
 				${=FZF_PREVIEW_OPTS} \
-				--preview "git show $GIT_COLOR_OPTS \$(grep -o '[a-f0-9]\\{7,\\}' <<< {})" \
+				--preview "git show $GIT_COLOR_OPTS \$(grep -o '[a-f0-9]\\{7,\\}' <<< {} | head -1)" \
 			| grep -o "[a-f0-9]\{7,\}"
 		)
 		res=$?

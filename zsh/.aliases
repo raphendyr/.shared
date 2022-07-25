@@ -125,6 +125,15 @@ if type -p minikube >/dev/null; then
 	fi
 fi
 
+if type -p terraform >/dev/null; then
+	# minikube completion
+	if [ "${ZSH_VERSION:-}" ]; then
+		complete -o nospace -C terraform terraform
+	elif [ "${BASH_VERSION:-}" ]; then
+		complete -C terraform terraform
+	fi
+fi
+
 
 [ -r "$HOME/.aliases.local" ] && . "$HOME/.aliases.local"
 # vim: set ts=4 sw=4 tw=0 noet syntax=sh filetype=sh :

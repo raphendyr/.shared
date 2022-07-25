@@ -64,9 +64,10 @@ zstyle ':completion:*:*:kill:*' menu yes select
 zstyle ':completion:*:*:kill:*' force-list always
 zstyle ':completion:*:*:kill:*:processes' command 'ps -o pid,tty,stat,args -u $UID'
 
-autoload -Uz compinit edit-command-line
+autoload -Uz compinit bashcompinit edit-command-line
 # .zcompdump incompatible between different versions
-compinit -d "$ZSH_CACHE_DIR/zcompdump-${ZSH_VERSION:-$(zsh --version | awk '{print $2}')}"
+compinit -d "$ZSH_CACHE_DIR/zcompdump-${ZSH_VERSION:-$(zsh --version | cut -d' ' -f2)}"
+bashcompinit
 
 zle -N edit-command-line
 # normal-ish readline behaviour in insert mode

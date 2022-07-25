@@ -106,6 +106,27 @@ function +my-downloadable() {
 			if [ "$tmp" -a -d "$tmp" ]; then rm -r "$tmp"; fi
 			return $code
 			;;
+		terraform)
+			case "$OSTYPE" in
+				darwin*) os="darwin" ;;
+				linux*) os="linux" ;;
+				*) +my-downloadable-msg "Unknown OS '$OSTYPE' for minikube." ; return 1 ;;
+			esac
+			# TODO: dynamic version
+			local version="1.0.0"
+			# TODO: verify sig https://releases.hashicorp.com/terraform/1.0.0/terraform_1.0.0_SHA256SUMS.sig
+			tmp=$(mktemp -d /tmp/download-terraform.XXXXX) && (
+				cd "$tmp" \
+				&& +my-downloadable-download "https://releases.hashicorp.com/terraform/${version}/terraform_${version}_${os}_amd64.zip" \
+				&& +my-downloadable-download "https://releases.hashicorp.com/terraform/${version}/terraform_${version}_SHA256SUMS" \
+				&& +my-downloadable-verify "terraform_${version}_${os}_amd64.zip" "terraform_${version}_SHA256SUMS" \
+				&& unzip "terraform_${version}_${os}_amd64.zip" 'terraform' \
+				&& +my-downloadable-install 'terraform' \
+				&& +my-downloadable-msg "command 'terraform' ready, executing..." \
+			) || code=1
+			if [ "$tmp" -a -d "$tmp" ]; then rm -r "$tmp"; fi
+			return $code
+			;;
 		*)
 			echo "Uknown binary '$1'" >&2
 			return 64
@@ -118,6 +139,7 @@ for _binary in \
 	dyff \
 	kubectl \
 	minikube \
+	terraform \
 ; do
 	if ! command -v "$_binary" >/dev/null; then
 		function "$_binary"() {

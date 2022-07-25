@@ -1,0 +1,93 @@
+#!/bin/sh -eu
+
+case "$(uname -s)" in
+	Linux*)
+		hostname=$(hostname --all-fqdn|cut -d' ' -f1)
+		get_uuid() { cat /proc/sys/kernel/random/uuid ; }
+		b64w() { base64 -w0 | tr -d '=\n' | tr '/+' '_-' ; }
+		;;
+	Darwin*)
+		hostname=$(hostname | cut -d' ' -f1)
+		get_uuid() { uuidgen ; }
+		b64w() { base64 | tr -d '=' | tr '/+' '_-' ; }
+		;;
+    *)
+		echo "Unknown platform $(uname -s). Please implement!" >&2
+		exit 1
+		;;
+esac
+
+
+alg="rs512"
+key="private_key.pem"
+bits=2048
+slen=32
+
+while [ $# -gt 0 ]; do
+	case "$1" in
+		-a) alg=$(echo "$2"|tr '[:upper:]' '[:lower:]') ; shift 2 ;;
+		-k) key=$2 ; shift 2 ;;
+		-b) bits=$2 ; shift 2 ;;
+		-s) secret=$2 ; shift 2 ;;
+		-l) slen=$2 ; shift 2 ;;
+		--) shift ; break ;;
+		-*) echo "ERROR: Invalid option '$1' for $0" >&2 ; exit 64 ;;
+		*) break ;;
+	esac
+done
+
+user=${1:-$USER@$hostname}
+sub=${user%%@*}
+iss=${user##*@}
+
+
+_sign() {
+	set -- openssl dgst -binary
+	case "$alg" in
+		*256) set -- "$@" -sha256 ;;
+		*384) set -- "$@" -sha384 ;;
+		*512) set -- "$@" -sha512 ;;
+	esac
+	case "$alg" in
+		rs*) set -- "$@" -sign "$key" ;;
+		#hs*) set -- "$@" -hmac "$secret" ;;
+		hs*) set -- "$@" -mac HMAC -macopt "hexkey:$secrethex" ;;
+	esac
+	"$@"
+}
+
+sign() {
+	printf '%s' "$1" | _sign | b64w
+}
+
+header=$(echo '{"typ": "JWT", "alg": "'"$(echo "$alg" | tr '[:lower:]' '[:upper:]')"'"}' | jq -c '.')
+
+case "$alg" in
+	rs256|rs384|rs512)
+		[ -e "$key" ] || openssl genpkey -algorithm RSA -out "$key" -pkeyopt "rsa_keygen_bits:$bits"
+		echo
+		openssl rsa -pubout -in private_key.pem -outform PEM
+		echo
+		header=$(echo "$header" | jq -c ".kid = \"${key##*/}\"")
+		;;
+	hs256|hs384|hs512)
+		[ "${secret:-}" ] || secret=$(head -c "$slen" /dev/urandom|base64 -w0)
+		secrethex=$(echo "$secret" | base64 -d | xxd -p | tr -d '\n')
+		echo "base64(secret): $secret"
+		;;
+	*)
+		echo "Invalid algorithm $alg" >&2
+		exit 1
+		;;
+esac
+
+jwi=$(get_uuid)
+payload=$(
+	echo '{"sub": "'"$sub"'", "iss": "'"$iss"'", "jwi": "'"$jwi"'"}' | \
+		jq -c --arg time_str "$(date +%s)" '($time_str | tonumber) as $time | .iat=$time | .exp=($time + 60*60*24*30)'
+)
+content="$(echo "$header" | b64w).$(echo "$payload" | b64w)"
+signature="$(sign "$content")"
+echo "$header" | jq '.'
+echo "$payload" | jq '.'
+echo "${content}.${signature}"

@@ -1,0 +1,11 @@
+#!/bin/sh
+
+decode() {
+	tr '_-' '/+' | jq -R 'split(".") | {"header": .[0] | @base64d | fromjson, "payload": .[1] | @base64d | fromjson, "signature": .[2]}'
+}
+
+if [ "$1" ]; then
+	echo "$1" | decode
+else
+	decode
+fi

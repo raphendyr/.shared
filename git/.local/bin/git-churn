@@ -1,0 +1,20 @@
+#!/bin/sh
+set -e
+
+# originally from: https://github.com/garybernhardt/dotfiles/blob/f0c0ff92209e5aed4fa3ef6faf056eb9944a8f12/bin/git-churn
+
+# Show churn for whole repo:
+#   $ git churn
+#
+# Show churn for specific directories:
+#   $ git churn app lib
+#
+# Show churn for a time range:
+#   $ git churn --since='1 month ago'
+#
+# (These are all standard arguments to `git log`.)
+
+git log --all -M -C --name-only --format='format:' "$@" \
+    | grep -v '^$' \
+    | sort | uniq -c | sort -gr \
+    | awk 'BEGIN {print "count\tfile"} {print $1 "\t" $2}'

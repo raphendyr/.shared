@@ -1,0 +1,29 @@
+#!/bin/sh
+
+analyse() {
+    linesnow=$(wc -l "$1" | awk '{print $1}')
+    if [ "$linesnow" -gt 0 ]; then
+        additions=$(git log --numstat "$1" | awk '/^[0-9]+[ \t]+[0-9]+[ \t]+/ {t+=$1} END {print t}')
+        if [ "$additions" ]; then
+            percent=$(echo "scale=1; (($additions / $linesnow) - 1) * 100" | bc)
+            printf "%-30s  %s%%\n" "$1" "$percent"
+        else
+            echo "File not in git $1" >&2
+        fi
+    fi
+}
+
+if [ $# -gt 0 ]; then
+    while [ $# -gt 0 ]; do
+        if [ -d "$1" ]; then
+            echo "Skipping directory $1" >&2
+        else
+            analyse "$1"
+        fi
+        shift
+    done
+else
+    git ls-files | while read file; do
+        analyse "$file"
+    done
+fi

@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+email=$(git config --get user.email)
+
+for b in $(git branch -r | grep -vF '/HEAD ' | sed 's/^..//'); do
+    log=$(git log -1 --pretty=format:"%aE %ci %cr" "$b" --)
+    if [[ $log =~ ^$email ]]; then
+        echo "${log#* }	$b"
+    fi
+done | sort -r

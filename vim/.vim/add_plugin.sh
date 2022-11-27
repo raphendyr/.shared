@@ -40,3 +40,5 @@ for dir in \
 		done
 	fi
 done
+
+find . -xtype l -delete

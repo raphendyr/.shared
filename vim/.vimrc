@@ -115,6 +115,11 @@ let g:ale_fixers = {
 \   'elixir': ['mix_format'],
 \}
 
+" Ansible
+let g:ansible_unindent_after_newline = 1
+let g:ansible_attribute_highlight = "b"
+let g:ansible_name_highlight = 'd'
+
 " Better Whitespace
 let g:better_whitespace_ctermcolor='DarkGreen'
 let g:better_whitespace_guicolor='DarkGreen'

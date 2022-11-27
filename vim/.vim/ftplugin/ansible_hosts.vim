@@ -1,0 +1,1 @@
+../_git/ansible-vim/ftplugin/ansible_hosts.vim

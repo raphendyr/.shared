@@ -1,0 +1,1 @@
+../_git/ansible-vim/syntax/ansible.vim

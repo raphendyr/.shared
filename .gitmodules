@@ -1,3 +1,6 @@
+[submodule "vim/.vim/_git/ansible-vim"]
+	path = vim/.vim/_git/ansible-vim
+	url = https://github.com/pearofducks/ansible-vim.git
 [submodule "vim/.vim/_git/editorconfig-vim"]
 	path = vim/.vim/_git/editorconfig-vim
 	url = https://github.com/editorconfig/editorconfig-vim.git

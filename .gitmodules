@@ -1,3 +1,9 @@
+[submodule "node/.local/share/nvm"]
+	path = node/.local/share/nvm
+	url = https://github.com/nvm-sh/nvm.git
+[submodule "node/.local/share/zsh/plugins/zsh-nvm"]
+	path = node/.local/share/zsh/plugins/zsh-nvm
+	url = https://github.com/lukechilds/zsh-nvm.git
 [submodule "vim/.config/vim/pack/config/start/editorconfig-vim"]
 	path = vim/.config/vim/pack/config/start/editorconfig-vim
 	url = https://github.com/editorconfig/editorconfig-vim.git

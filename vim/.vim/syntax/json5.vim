@@ -1,1 +1,0 @@
-../_git/vim-json5/syntax/json5.vim

@@ -1,1 +1,0 @@
-../_git/vim-elixir/ftplugin/eelixir.vim

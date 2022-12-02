@@ -1,1 +1,0 @@
-../_git/ansible-vim/syntax/ansible_hosts.vim

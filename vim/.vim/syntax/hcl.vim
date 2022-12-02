@@ -1,1 +1,0 @@
-../_git/vim-terraform/syntax/hcl.vim

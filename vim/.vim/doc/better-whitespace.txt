@@ -1,1 +1,0 @@
-../_git/vim-better-whitespace/doc/better-whitespace.txt

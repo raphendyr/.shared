@@ -8,6 +8,12 @@ if !isdirectory(g:vim_cache_dir)
 endif
 execute "set viminfofile=".escape(g:vim_cache_dir."/viminfo", ' ')
 
+let g:vim_config_home = (exists("$XDG_CONFIG_HOME") ? $XDG_CONFIG_HOME : $HOME."/.config")."/vim"
+if isdirectory(g:vim_cache_dir)
+    let &runtimepath = expand(g:vim_config_home).','.&runtimepath
+    let &packpath = &runtimepath
+endif
+
 " Uncomment the next line to make Vim more Vi-compatible
 " NOTE: debian.vim sets 'nocompatible'.  Setting 'compatible' changes numerous
 " options, so any other options should be set AFTER setting 'compatible'.

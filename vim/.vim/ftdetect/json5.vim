@@ -1,1 +1,0 @@
-../_git/vim-json5/ftdetect/json5.vim

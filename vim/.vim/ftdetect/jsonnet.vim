@@ -1,1 +1,0 @@
-../_git/vim-jsonnet/ftdetect/jsonnet.vim

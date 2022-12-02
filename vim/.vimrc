@@ -88,12 +88,19 @@ function! LinterStatus() abort
     \ . errors > 0 ? printf('%dE', errors) : ''
 endfunction
 
+" Copilot status line (i.e., warning)
+function! CopilotStatus() abort
+    return get(b:, 'copilot_statusline', 0) ? '[-CoPILOT-]' : ''
+endfunction
+
 hi User1 cterm=None ctermfg=White ctermbg=DarkRed gui=None guifg=White guibg=DarkRed
 set laststatus=2
 set showmode
-let &statusline  = ' %n %<%f '                          " Buffer number, File path, modified
-let &statusline .= '%1*%{&ma && &mod?"[+]":""}%0*'      " highlighted modified tag
-let &statusline .= '%(%1* %{LinterStatus()} %0*%)'       " Linter problems
+let &statusline = ' %n'
+let &statusline .= '%( %2*%{CopilotStatus()}%0*%)'      " Copilot enabled
+let &statusline .= ' %<%f'                              " Buffer number, File path, modified
+let &statusline .= ' %1*%{&ma && &mod?"[+]":""}%0*'     " highlighted modified tag
+let &statusline .= '%(%1* %{LinterStatus()} %0*%)'      " Linter problems
 let &statusline .= ' %( %R%W %)'                        " opt: readonly, preview
 let &statusline .= ' %{&ft}'                            " FileType
 let &statusline .= '%(,%{&fenc!="utf-8"?&fenc:""}%)'    " Encoding

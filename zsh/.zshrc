@@ -161,6 +161,7 @@ setopt transient_rprompt # remove right prompt after command is entered
 # Handle functions and plugins
 [[ -d "$ZSH_DATA_DIR/functions" ]] && fpath=("$ZSH_DATA_DIR/functions" $fpath)
 [[ -d "$ZSH/functions" ]] && fpath=("$ZSH/functions" $fpath)
+# Main plugins, with specific order of loading
 if [[ -d "$ZSH/plugins" ]]; then
 	autoload -Uz add-zsh-hook
 	for _plugin in \
@@ -171,8 +172,6 @@ if [[ -d "$ZSH/plugins" ]]; then
 		my-docker-info \
 		dotenv \
 		my-jobs-info \
-		zsh-autosuggestions \
-		zsh-syntax-highlighting \
 		fzf \
 		my-downloadable \
 	; do
@@ -183,6 +182,20 @@ if [[ -d "$ZSH/plugins" ]]; then
 		else
 			echo "Unable read '$_path', are submodules downloaded?"
 		fi
+	done; unset _plugin _path
+fi
+# Rest of the plugins, which are optionally installed to the system
+if [[ -d "$ZSH_DATA_DIR/plugins" ]]; then
+	autoload -Uz add-zsh-hook
+	for _plugin ("$ZSH_DATA_DIR/plugins/"*/); do
+		for _path ("$_plugin${${_plugin%/}##*/}.plugin.zsh" "$_plugin${${_plugin%/}##*/}.zsh"); do
+			if [[ -f $_path ]]; then
+				[[ -f "${_path:h}.before.zsh" ]] && . "${_path:h}.before.zsh"
+				. "$_path"
+				[[ -f "${_path:h}.after.zsh" ]] && . "${_path:h}.after.zsh"
+				break
+			fi
+		done
 	done; unset _plugin _path
 fi
 # autload all functions from fpaths under HOME

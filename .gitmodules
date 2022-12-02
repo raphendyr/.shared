@@ -28,9 +28,9 @@
 [submodule "vim/.vim/_git/vim-vinegar"]
 	path = vim/.vim/_git/vim-vinegar
 	url = https://github.com/tpope/vim-vinegar.git
-[submodule "zsh/plugins/zsh-autosuggestions"]
-	path = zsh/plugins/zsh-autosuggestions
+[submodule "zsh/.local/share/zsh/plugins/zsh-autosuggestions"]
+	path = zsh/.local/share/zsh/plugins/zsh-autosuggestions
 	url = https://github.com/zsh-users/zsh-autosuggestions.git
-[submodule "zsh/plugins/zsh-syntax-highlighting"]
-	path = zsh/plugins/zsh-syntax-highlighting
+[submodule "zsh/.local/share/zsh/plugins/zsh-syntax-highlighting"]
+	path = zsh/.local/share/zsh/plugins/zsh-syntax-highlighting
 	url = https://github.com/zsh-users/zsh-syntax-highlighting.git

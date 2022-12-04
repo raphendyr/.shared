@@ -48,6 +48,8 @@ if has("autocmd")
     autocmd BufNewFile,BufRead Dockerfile.* setf dockerfile
     " Some json files are really json5 files
     autocmd BufNewFile,BufRead tsconfig.json set ft=json5 ts=2 sw=2
+    " Special Erlang relatex lexer/parser files
+    autocmd BufNewFile,BufRead *.[xy]rl set ft=erlang ts=2 sw=2
 endif
 
 " Fancy features

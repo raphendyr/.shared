@@ -127,6 +127,7 @@ let g:ale_fixers = {
 \   'elixir': ['remove_trailing_lines', 'trim_whitespace', 'mix_format'],
 \   'javascript': ['remove_trailing_lines', 'trim_whitespace', 'eslint'],
 \   'javascriptreact': ['remove_trailing_lines', 'trim_whitespace', 'eslint'],
+\   'python': ['remove_trailing_lines', 'trim_whitespace', 'autopep8'],
 \   'terraform': ['remove_trailing_lines', 'trim_whitespace', 'terraform'],
 \   'typescript': ['remove_trailing_lines', 'trim_whitespace', 'eslint'],
 \   'typescriptreact': ['remove_trailing_lines', 'trim_whitespace', 'eslint'],

@@ -18,6 +18,10 @@
 [core]
 	excludesFile = ~/.config/git/ignore
 	hooksPath = ~/.config/git/hooks
+[include]
+	path = ~/.gitconfig.local
+[advice]
+	skippedCherryPicks = false
 [init]
 	defaultBranch = master
 [pull]
@@ -25,8 +29,5 @@
 [user]
 	name = Jaakko Kantojärvi
 	email = jaakko@n-1.fi
-
-[include]
-	path = ~/.gitconfig.local
 
 ;  vim: set ts=4 sw=4 tw=0 noet :

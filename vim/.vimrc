@@ -71,6 +71,11 @@ nnoremap <silent> <Leader>s :vsplit<CR>
 nnoremap <silent> <Leader>v :vsplit<CR>
 nnoremap <silent> <Leader>w :w<CR>
 nnoremap <silent> <Leader>f :ALEFix<CR>
+" move windows with shift+arrow
+nnoremap <S-DOWN> <C-W><C-J>
+nnoremap <S-UP> <C-W><C-K>
+nnoremap <S-RIGHT> <C-W><C-L>
+nnoremap <S-LEFT> <C-W><C-H>
 
 " Statusline
 function! LinterStatus() abort

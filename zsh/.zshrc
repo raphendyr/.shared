@@ -164,6 +164,21 @@ if [ -r "/etc/debian_chroot" -a -s "/etc/debian_chroot" ]; then
 		&& PS1="($(cat /etc/debian_chroot))$PS1" \
 		|| PS1="(%F{yellow}$(cat /etc/debian_chroot)%f)$PS1"
 fi
+function +twoline-prompt() {
+	local nl=$'\n'
+	[[ -v NORMAL_PS1 ]] && return
+	typeset -g NORMAL_PS1=$PS1
+	[[ $NO_COLOR ]] \
+		&& PS1="${PS1:gs/\%\#/}$nl%# " \
+		|| PS1="${PS1:gs/\%\#/}$nl%F{blue}%B%#%b%f "
+	# { zle && zle reset-prompt ; } 2>/dev/null || true
+}
+function +normal-prompt() {
+	[[ -v NORMAL_PS1 ]] || return
+	PS1=$NORMAL_PS1
+	unset NORMAL_PS1
+	# { zle && zle reset-prompt ; } 2>/dev/null || true
+}
 if [[ $NO_COLOR ]]; then
 	PS2='> '
 	PS3='?# '
@@ -176,6 +191,20 @@ fi
 # RPROMPT
 #RPS1='%1v'
 setopt transient_rprompt # remove right prompt after command is entered
+
+# automatic two line prompt, when window is too small
+# src: https://github.com/zsh-users/zsh/blob/master/Functions/Prompts/prompt_bart_setup
+function +select-prompt() {
+	local zero='%([BSUbfksu]|[FB]{*})' colno pslen
+	((colno = COLUMNS-2))
+	((pslen = ${#${(f)${(%%)${(S)PS1//$~zero/}}}[1]}))
+	((pslen == 1)) && ((pslen = ${#${(%%)${(S)PS1//$~zero/}}}))
+	local plen=${#${(f)${(%%)${(S)PS1//$~zero/}}}[1]}
+	((colno / 2 < pslen)) && +twoline-prompt || +normal-prompt
+}
+add-zsh-hook chpwd +select-prompt
+add-my-hook trapwinch +select-prompt
++select-prompt
 
 # Main plugins, with specific order of loading
 if [[ -d "$ZSH/plugins" ]]; then

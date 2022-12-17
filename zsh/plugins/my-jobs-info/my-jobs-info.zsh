@@ -32,7 +32,4 @@ function +my-add-jobs-trap-CHLD() {
 }
 
 # Note `trap +my-add-jobs-trap-CHLD CHLD` uses subshell, which breaks zle
-# TODO: support hooks like system to add functions to traps
-TRAPCHLD() {
-	+my-add-jobs-trap-CHLD
-}
+add-my-hook trapchld +my-add-jobs-trap-CHLD

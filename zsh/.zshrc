@@ -129,6 +129,24 @@ stty erase 
 stty erase 
 stty intr  
 
+# Handle functions and plugins
+[[ -d "$ZSH_DATA_DIR/functions" ]] && fpath=("$ZSH_DATA_DIR/functions" $fpath)
+[[ -d "$ZSH/functions" ]] && fpath=("$ZSH/functions" $fpath)
+
+# Extra hooks
+autoload -Uz add-zsh-hook add-my-hook
+
+typeset -ga trapchld_functions
++trapchld() { for f ($trapchld_functions); do "$f"; done; }
+functions[TRAPCHLD]="+trapchld
+${functions[TRAPCHLD]//+trapchld}"
+
+typeset -ga trapwinch_functions
++trapwinch() { for f ($trapwinch_functions); do "$f"; done; }
+functions[TRAPWINCH]="+trapwinch
+${functions[TRAPWINCH]//+trapwinch}"
+
+
 # PS1
 if [[ $NO_COLOR ]]; then
 	PS1='%n@%m'
@@ -159,12 +177,8 @@ fi
 #RPS1='%1v'
 setopt transient_rprompt # remove right prompt after command is entered
 
-# Handle functions and plugins
-[[ -d "$ZSH_DATA_DIR/functions" ]] && fpath=("$ZSH_DATA_DIR/functions" $fpath)
-[[ -d "$ZSH/functions" ]] && fpath=("$ZSH/functions" $fpath)
 # Main plugins, with specific order of loading
 if [[ -d "$ZSH/plugins" ]]; then
-	autoload -Uz add-zsh-hook
 	for _plugin in \
 		my-title \
 		my-git-info \
@@ -186,7 +200,6 @@ if [[ -d "$ZSH/plugins" ]]; then
 fi
 # Rest of the plugins, which are optionally installed to the system
 if [[ -d "$ZSH_DATA_DIR/plugins" ]]; then
-	autoload -Uz add-zsh-hook
 	for _plugin ("$ZSH_DATA_DIR/plugins/"*/); do
 		for _path ("$_plugin${${_plugin%/}##*/}.plugin.zsh" "$_plugin${${_plugin%/}##*/}.zsh"); do
 			if [[ -f $_path ]]; then

@@ -166,7 +166,6 @@ setopt transient_rprompt # remove right prompt after command is entered
 if [[ -d "$ZSH/plugins" ]]; then
 	autoload -Uz add-zsh-hook
 	for _plugin in \
-		iterm2 \
 		my-title \
 		my-git-info \
 		my-virtualenv \

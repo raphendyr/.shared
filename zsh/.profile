@@ -4,6 +4,7 @@
 export AWS_SESSION_TOKEN_TTL=2h
 export AWS_ASSUME_ROLE_TTL=2h
 export AWS_MIN_TTL=15m
+export DEBFULLNAME="Jaakko Kantojärvi"
 export DEBEMAIL=jaakko@n-1.fi
 export LIBVIRT_DEFAULT_URI="qemu:///system"
 

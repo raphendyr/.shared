@@ -119,7 +119,7 @@ if type -p minikube >/dev/null; then
 					esac
 					;;
 			esac
-			return ret
+			return $ret
 		}
 		compdef _docker-on-minikube docker-on-minikube
 	fi

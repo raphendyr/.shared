@@ -2,7 +2,7 @@
 [ "$PS1" ] || return
 
 BASH_CACHE_DIR="${XDG_CACHE_HOME:-$HOME/.cache}/bash"
-[ -d "$BASH_CACHE_DIR" ] || mkdir -m 0700 -p "$BASH_CACHE_DIR"
+[[ -d "$BASH_CACHE_DIR" ]] || mkdir -m 0700 -p "$BASH_CACHE_DIR"
 
 HISTCONTROL=ignoredups
 HISTFILE="$BASH_CACHE_DIR/bash_history"
@@ -23,17 +23,17 @@ if [[ $PROMPT_COMMAND != *'__build_prompt'* || $PROMPT_COMMAND != *'__update_tit
 fi
 
 # Aliases
-[ -f "$HOME/.travis/travis.sh" ] && . "$HOME/.travis/travis.sh"
-[ -r "$HOME/.aliases" ] && . "$HOME/.aliases"
+[[ -f "$HOME/.travis/travis.sh" ]] && . "$HOME/.travis/travis.sh"
+[[ -r "$HOME/.aliases" ]] && . "$HOME/.aliases"
 
 # Completion
-[ -z "${BASH_COMPLETION_VERSINFO:-}" ] \
+[[ -z "${BASH_COMPLETION_VERSINFO:-}" ]] \
 	&& ! shopt -oq posix \
-	&& [ -f /etc/bash_completion ] \
+	&& [[ -f /etc/bash_completion ]] \
 	&& . /etc/bash_completion
 
 # Local changes
-[ -r "$HOME/.bashrc.local" ] && . "$HOME/.bashrc.local"
+[[ -r "$HOME/.bashrc.local" ]] && . "$HOME/.bashrc.local"
 
 true # set exit 0 for prompt
 

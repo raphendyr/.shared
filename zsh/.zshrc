@@ -249,9 +249,9 @@ for _path ($fpath); do
 done; unset _path _function
 
 # Read aliases
-[ -f "$HOME/.travis/travis.sh" ] && . "$HOME/.travis/travis.sh"
-[ -r "$HOME/.aliases" ] && . "$HOME/.aliases"
-[ -r "$HOME/.zshrc.local" ] && . "$HOME/.zshrc.local"
+[[ -f "$HOME/.travis/travis.sh" ]] && . "$HOME/.travis/travis.sh"
+[[ -r "$HOME/.aliases" ]] && . "$HOME/.aliases"
+[[ -r "$HOME/.zshrc.local" ]] && . "$HOME/.zshrc.local"
 true # set exit 0 for prompt
 
 # vim: set ts=4 sw=4 tw=0 noet syntax=zsh filetype=zsh :

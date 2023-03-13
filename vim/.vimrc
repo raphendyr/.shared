@@ -125,6 +125,7 @@ let g:ale_lint_on_text_changed = 'never'
 let g:ale_fixers = {
 \   '*': ['remove_trailing_lines', 'trim_whitespace'],
 \   'elixir': ['remove_trailing_lines', 'trim_whitespace', 'mix_format'],
+\   'go': ['remove_trailing_lines', 'trim_whitespace', 'gofmt'],
 \   'javascript': ['remove_trailing_lines', 'trim_whitespace', 'eslint'],
 \   'javascriptreact': ['remove_trailing_lines', 'trim_whitespace', 'eslint'],
 \   'python': ['remove_trailing_lines', 'trim_whitespace', 'autopep8'],

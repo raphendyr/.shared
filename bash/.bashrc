@@ -4,7 +4,7 @@
 BASH_CACHE_DIR="${XDG_CACHE_HOME:-$HOME/.cache}/bash"
 [[ -d "$BASH_CACHE_DIR" ]] || mkdir -m 0700 -p "$BASH_CACHE_DIR"
 
-HISTCONTROL=ignoredups
+HISTCONTROL=ignoredups:ignorespace
 HISTFILE="$BASH_CACHE_DIR/bash_history"
 HISTSIZE=50000
 HISTFILESIZE=10000

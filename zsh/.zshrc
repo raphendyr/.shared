@@ -147,23 +147,37 @@ functions[TRAPWINCH]="+trapwinch
 ${functions[TRAPWINCH]//+trapwinch}"
 
 
-# PS1
-if [[ $NO_COLOR ]]; then
-	PS1='%n@%m'
-elif [[ $EUID == 0 ]]; then
-	PS1='%F{red}%B%m%b%f'
-else
-	PS1='%F{green}%n%f@%F{green}%m%f'
-fi
-# full path: ':%F{cyan}%~%f'
-[[ $NO_COLOR ]] \
-	&& PS1="$PS1"':%(6~|%-2~/…/%3~|%~)%(?.. %? )%# ' \
-	|| PS1="$PS1"':%F{cyan}%(6~|%-2~/…/%3~|%~)%(?.. %F{red}%B%?%b )%f%# '
-if [ -r "/etc/debian_chroot" -a -s "/etc/debian_chroot" ]; then
+# Prompts
+function +reset-prompts() {
+	# PS1
+	if [[ $NO_COLOR ]]; then
+		PS1='%n@%m'
+	elif [[ $EUID == 0 ]]; then
+		PS1='%F{red}%B%m%b%f'
+	else
+		PS1='%F{green}%n%f@%F{green}%m%f'
+	fi
+	# full path: ':%F{cyan}%~%f'
 	[[ $NO_COLOR ]] \
-		&& PS1="($(cat /etc/debian_chroot))$PS1" \
-		|| PS1="(%F{yellow}$(cat /etc/debian_chroot)%f)$PS1"
-fi
+		&& PS1="$PS1"':%(6~|%-2~/…/%3~|%~)%(?.. %? )%# ' \
+		|| PS1="$PS1"':%F{cyan}%(6~|%-2~/…/%3~|%~)%(?.. %F{red}%B%?%b )%f%# '
+	if [ -r "/etc/debian_chroot" -a -s "/etc/debian_chroot" ]; then
+		[[ $NO_COLOR ]] \
+			&& PS1="($(cat /etc/debian_chroot))$PS1" \
+			|| PS1="(%F{yellow}$(cat /etc/debian_chroot)%f)$PS1"
+	fi
+
+	if [[ $NO_COLOR ]]; then
+		PS2='> '
+		PS3='?# '
+		PS4='+%N:%i> '
+	else
+		PS2='%F{magenta}%B%_%b%f> '
+		PS3='%F{magenta}%B?%b%f# '
+		PS4='%B%F{black}+%b%f%F{blue}%I%f:%F{cyan}%N%f:%F{blue}%i%f> '
+	fi
+}
+
 function +twoline-prompt() {
 	local nl=$'\n'
 	[[ -v NORMAL_PS1 ]] && return
@@ -173,24 +187,16 @@ function +twoline-prompt() {
 		|| PS1="${PS1:gs/\%\#/}$nl%F{blue}%B%#%b%f "
 	# { zle && zle reset-prompt ; } 2>/dev/null || true
 }
+
 function +normal-prompt() {
-	[[ -v NORMAL_PS1 ]] || return
-	PS1=$NORMAL_PS1
-	unset NORMAL_PS1
+	if [[ -v NORMAL_PS1 ]]; then
+		PS1=$NORMAL_PS1
+		unset NORMAL_PS1
+	else
+		+reset-prompts
+	fi
 	# { zle && zle reset-prompt ; } 2>/dev/null || true
 }
-if [[ $NO_COLOR ]]; then
-	PS2='> '
-	PS3='?# '
-	PS4='+%N:%i> '
-else
-	PS2='%F{magenta}%B%_%b%f> '
-	PS3='%F{magenta}%B?%b%f# '
-	PS4='%B%F{black}+%b%f%F{blue}%I%f:%F{cyan}%N%f:%F{blue}%i%f> '
-fi
-# RPROMPT
-#RPS1='%1v'
-setopt transient_rprompt # remove right prompt after command is entered
 
 # automatic two line prompt, when window is too small
 # src: https://github.com/zsh-users/zsh/blob/master/Functions/Prompts/prompt_bart_setup
@@ -204,7 +210,14 @@ function +select-prompt() {
 }
 add-zsh-hook chpwd +select-prompt
 add-my-hook trapwinch +select-prompt
+
++reset-prompts
 +select-prompt
+
+# RPROMPT
+#RPS1='%1v'
+setopt transient_rprompt # remove right prompt after command is entered
+
 
 # Main plugins, with specific order of loading
 if [[ -d "$ZSH/plugins" ]]; then

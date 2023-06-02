@@ -42,7 +42,7 @@ if command -v ruby > /dev/null; then
 	for d in ".gem/ruby" ".local/lib/Homebrew/lib/ruby/gems"; do
 		add_path "$HOME/$d/$ruby_ver/bin" append
 	done
-	unset ruby_ver
+	unset d ruby_ver
 fi
 
 if command -v python3 > /dev/null; then
@@ -50,7 +50,7 @@ if command -v python3 > /dev/null; then
 	for d in "Library/Python"; do
 		add_path "$HOME/$d/$python_ver/bin" append
 	done
-	unset python_ver
+	unset d python_ver
 fi
 
 

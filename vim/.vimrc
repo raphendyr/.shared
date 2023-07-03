@@ -126,12 +126,12 @@ let g:ale_fixers = {
 \   '*': ['remove_trailing_lines', 'trim_whitespace'],
 \   'elixir': ['remove_trailing_lines', 'trim_whitespace', 'mix_format'],
 \   'go': ['remove_trailing_lines', 'trim_whitespace', 'gofmt'],
-\   'javascript': ['remove_trailing_lines', 'trim_whitespace', 'eslint'],
-\   'javascriptreact': ['remove_trailing_lines', 'trim_whitespace', 'eslint'],
+\   'javascript': ['remove_trailing_lines', 'trim_whitespace', 'eslint', 'prettier'],
+\   'javascriptreact': ['remove_trailing_lines', 'trim_whitespace', 'eslint', 'prettier'],
 \   'python': ['remove_trailing_lines', 'trim_whitespace', 'autopep8'],
 \   'terraform': ['remove_trailing_lines', 'trim_whitespace', 'terraform'],
-\   'typescript': ['remove_trailing_lines', 'trim_whitespace', 'eslint'],
-\   'typescriptreact': ['remove_trailing_lines', 'trim_whitespace', 'eslint'],
+\   'typescript': ['remove_trailing_lines', 'trim_whitespace', 'eslint', 'prettier'],
+\   'typescriptreact': ['remove_trailing_lines', 'trim_whitespace', 'eslint', 'prettier'],
 \}
 nnoremap <silent> <Leader>a :ALEToggleBuffer<CR>
 

@@ -7,7 +7,7 @@
 	f = fetch
 	fix = commit --fixup
 	fp = fetch --prune
-	l = !git log --graph --decorate --abbrev-commit --all --pretty=oneline || true
+	l = lol
 	lol = !git log --graph --decorate --abbrev-commit --all --pretty='format:%C(auto)%h %d %s %C(green)[%an] %C(bold blue)%ad' --date=relative || true
 	ls-ignored = ls-files -o -i --exclude-standard
 	p = push

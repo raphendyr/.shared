@@ -56,9 +56,9 @@ else
 fi
 
 if [ "$commit_range" ]; then
-	fixmes=$(git diff --name-only "$commit_range" | xargs git grep -nF 'FIXME' || true)
+	fixmes=$(git diff --name-only "$commit_range" | xargs git grep --cached -nF 'FIXME' -- || true)
 else
-	fixmes=$(git grep -nF 'FIXME' | grep -v 'git/.githooks/prepare-commit-msg' || true)
+	fixmes=$(git grep --cached -nF 'FIXME' | grep -vF 'git/.githooks/prepare-commit-msg' || true)
 fi
 
 if [ "$fixmes" ]; then

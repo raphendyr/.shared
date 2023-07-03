@@ -1,0 +1,62 @@
+function +my-terminal-osc() {
+	printf "\e]${(j:;:)@}\a"
+}
+
+if [[ -o interactive && ${LC_TERMINAL:-} == 'iTerm2' ]]; then
+	# https://iterm2.com/documentation-escape-codes.html
+	#
+	# FinalTerm API end of command and start of prompt
+	function +my-terminal-precmd() {
+		local exitstatus=$?
+		if [[ -z ${_my_terminal_executed:-} ]]; then +my-terminal-preexec; fi # -> C
+		+my-terminal-osc 133 'D' "$exitstatus"
+		+my-terminal-osc 133 "A"
+	}
+	add-zsh-hook precmd +my-terminal-precmd
+
+	# FinalTerm API start of command input
+	zle-line-init() {
+		+my-terminal-osc 133 'B'
+	}
+	zle -N zle-line-init
+
+	# FinalTerm API start of execution
+	if [[ ${TERM_PROGRAM:-} = "iTerm.app" ]]; then
+		function +my-terminal-preexec() {
+			+my-terminal-osc 133 'C' "\r"
+			_my_terminal_executed=x
+		}
+	else
+		function +my-terminal-preexec() {
+			+my-terminal-osc 133 'C' ''
+			_my_terminal_executed=x
+		}
+	fi
+	add-zsh-hook preexec +my-terminal-preexec
+
+	# iTerm API set directory
+	function +my-terminal-chpwd() {
+		+my-terminal-osc 1337 "CurrentDir=$PWD"
+	}
+	add-zsh-hook chpwd +my-terminal-chpwd
+
+	# default case, command is called
+	# 1. precmd - A
+	# 2. zle-linit-init (user input start) - B
+	# 3. preexec - C
+	# 4. precmd - D;exitStatus
+	#
+	# cancel is called (^C)
+	# 1. precmd - A
+	# 2. zle-linit-init (user input start) - B
+	# 4. precmd:
+	#    - preexec - C
+	#    - precmd - D;exitStatus
+
+	# start:
+	+my-terminal-chpwd
+fi
+
+#+my-terminal-osc 6 1 bg red brightness 255
+#+my-terminal-osc 6 1 bg green brightness 0
+#+my-terminal-osc 6 1 bg blue brightness 255

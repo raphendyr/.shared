@@ -27,6 +27,8 @@
 	defaultBranch = master
 [pull]
 	ff = only
+[push]
+	default = upstream
 [user]
 	name = Jaakko Kantojärvi
 	email = jaakko@n-1.fi

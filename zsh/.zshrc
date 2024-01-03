@@ -8,8 +8,8 @@
 # History
 setopt appendhistory extended_history hist_expire_dups_first hist_ignore_dups
 HISTFILE="$ZSH_CACHE_DIR/zsh_history"
-HISTSIZE=50000
-SAVEHIST=10000
+HISTSIZE=1000000
+SAVEHIST=100000
 HISTORY_IGNORE="(ls|ls *|cd|cd..|cd ..|pwd|exit|rm -rf *)"
 HISTORY_IGNORE_SESSION="(  *|exit|rm -rf *)"
 zshaddhistory() {

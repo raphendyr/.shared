@@ -1,30 +1,49 @@
 {
-    "cSpell.userWords": [
-        "bouldering"
-    ],
-    "editor.wordWrap": "on",
-    "[jsonnet]": {
-        "editor.autoClosingBrackets": "never",
-        "editor.defaultFormatter": "Sebbia.jsonnetng"
-    },
-    "files.insertFinalNewline": true,
-    "files.trimFinalNewlines": true,
-    "files.trimTrailingWhitespace": true,
-    "editor.formatOnSave": true,
-    "terminal.integrated.fontSize": 14,
-    "breadcrumbs.symbolPath": "off",
-    "docker.languageserver.formatter.ignoreMultilineInstructions": true,
-    "redhat.telemetry.enabled": true,
-    "python.defaultInterpreterPath": "python3",
-    "python.disableInstallationCheck": true,
-    "python.experiments.enabled": false,
-    "editor.autoClosingOvertype": "never",
-    "editor.autoClosingDelete": "never",
-    "editor.autoSurround": "never",
+  "[jsonnet]": {
     "editor.autoClosingBrackets": "never",
-    "editor.autoClosingQuotes": "never",
-    "python.analysis.autoImportCompletions": false,
-    "workbench.editor.scrollToSwitchTabs": true,
-    "terminal.integrated.shellIntegration.enabled": false,
-    "git.openRepositoryInParentFolders": "never",
+    "editor.defaultFormatter": "Sebbia.jsonnetng"
+  },
+  "breadcrumbs.symbolPath": "off",
+  "cSpell.userWords": [
+    "bouldering"
+  ],
+  "coverage-gutters.coverageFileNames": [
+    "lcov.info",
+    "cov.xml",
+    "coverage.xml",
+    "jacoco.xml",
+    "coverage.cobertura.xml"
+  ],
+  "docker.languageserver.formatter.ignoreMultilineInstructions": true,
+  "editor.autoClosingBrackets": "never",
+  "editor.autoClosingDelete": "never",
+  "editor.autoClosingOvertype": "never",
+  "editor.autoClosingQuotes": "never",
+  "editor.autoSurround": "never",
+  "editor.formatOnSave": true,
+  "editor.minimap.enabled": false,
+  "editor.wordWrap": "on",
+  "explorer.confirmDelete": false,
+  "files.insertFinalNewline": true,
+  "files.trimFinalNewlines": true,
+  "files.trimTrailingWhitespace": true,
+  "git.openRepositoryInParentFolders": "never",
+  "isort.args": [
+    "--multi-line=3",
+    "--combine-as",
+    "--trailing-comma",
+    "--force-grid-wrap=3"
+  ],
+  "isort.check": true,
+  "jsonnet.executablePath": "/Users/raphendyr/.local/lib/Homebrew/bin/jsonnet",
+  "jsonnet.fmtExecutablePath": "/Users/raphendyr/.local/lib/Homebrew/bin/jsonnetfmt",
+  "python.analysis.autoImportCompletions": false,
+  "python.defaultInterpreterPath": "python3",
+  "python.disableInstallationCheck": true,
+  "python.experiments.enabled": false,
+  "redhat.telemetry.enabled": true,
+  "terminal.integrated.fontSize": 14,
+  "terminal.integrated.shellIntegration.enabled": false,
+  "window.zoomLevel": 1,
+  "workbench.editor.scrollToSwitchTabs": true,
 }

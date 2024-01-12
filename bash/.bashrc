@@ -27,10 +27,12 @@ fi
 [[ -r "$HOME/.aliases" ]] && . "$HOME/.aliases"
 
 # Completion
-[[ -z "${BASH_COMPLETION_VERSINFO:-}" ]] \
+if [[ -z "${BASH_COMPLETION_VERSINFO:-}" ]] \
 	&& ! shopt -oq posix \
-	&& [[ -f /etc/bash_completion ]] \
-	&& . /etc/bash_completion
+	&& [[ -f /etc/bash_completion ]]
+then
+	. /etc/bash_completion
+fi
 
 # Local changes
 [[ -r "$HOME/.bashrc.local" ]] && . "$HOME/.bashrc.local"

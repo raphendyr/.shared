@@ -11,6 +11,8 @@ shared_dir=$(
 )
 
 export HOMEBREW_NO_AUTO_UPDATE=1
+# these packages handle updates well (use space to separate)
+export HOMEBREW_BUNDLE_CASK_SKIP="telegram"
 
 brew_upgrade() {
 	brew update \

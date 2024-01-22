@@ -1,7 +1,5 @@
 tap "go-task/tap"
 tap "homebrew/bundle"
-tap "homebrew/cask"
-tap "homebrew/core"
 tap "instantclienttap/instantclient"
 brew "python-markupsafe"
 brew "ansible"

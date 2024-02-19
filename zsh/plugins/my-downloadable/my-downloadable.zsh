@@ -28,11 +28,32 @@ function +my-downloadable-install() {
 }
 
 function +my-downloadable() {
-	local code=0 os="" tmp=""
+	local code=0 os="" arch="" version="" tmp=""
+	arch='amd64'
 	case "$1" in
 		'')
 			echo "usage: $0 <binary>" >&2
 			return 64
+			;;
+		argocd)
+			#version='latest'
+			version='v2.7.10'
+			case "$OSTYPE" in
+				darwin*) os="darwin" ;;
+				linux*) os="linux" ;;
+				*) +my-downloadable-msg "Unknown OS '$OSTYPE' for argocd." ; return 1 ;;
+			esac
+			tmp=$(mktemp -d /tmp/download-argocd.XXXXX) && (
+				cd "$tmp" \
+				&& +my-downloadable-download "https://github.com/argoproj/argo-cd/releases/download/${version}/argocd-${os}-${arch}" \
+				&& +my-downloadable-download "https://github.com/argoproj/argo-cd/releases/download/${version}/cli_checksums.txt" \
+				&& +my-downloadable-verify "argocd-${os}-${arch}" 'cli_checksums.txt' \
+				&& mv "argocd-${os}-${arch}" 'argocd' \
+				&& +my-downloadable-install 'argocd' \
+				&& +my-downloadable-msg "command 'argocd' ready, executing..." \
+			) || code=1
+			if [ "$tmp" -a -d "$tmp" ]; then rm -r "$tmp"; fi
+			return $code
 			;;
 		drone)
 			case "$OSTYPE" in
@@ -135,6 +156,7 @@ function +my-downloadable() {
 }
 
 for _binary in \
+	argocd \
 	drone \
 	dyff \
 	kubectl \

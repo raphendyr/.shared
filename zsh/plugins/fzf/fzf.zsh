@@ -157,6 +157,7 @@ if command -v git >/dev/null; then
 	}
 	zle     -N      _fzf_git_hashes
 	bindkey '^gh'   _fzf_git_hashes
+	bindkey '^gg'   _fzf_git_hashes
 
 	_fzf_git_remotes() {
 		setopt localoptions pipefail no_aliases 2>/dev/null

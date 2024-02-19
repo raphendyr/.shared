@@ -24,7 +24,7 @@
 [advice]
 	skippedCherryPicks = false
 [init]
-	defaultBranch = master
+	defaultBranch = main
 [pull]
 	ff = only
 [push]

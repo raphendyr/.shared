@@ -15,8 +15,17 @@ export HOMEBREW_NO_AUTO_UPDATE=1
 export HOMEBREW_BUNDLE_CASK_SKIP="telegram"
 
 brew_upgrade() {
-	brew update \
-	&& brew bundle --file "$shared_dir/Brewfile" install \
+	attempt=0
+	while ! brew update; do
+		if [ "$attempt" -gt 8 ]; then
+			echo "Failed to update brew in time"
+			return 1
+		fi
+		attempt=$((attempt + 1))
+		sleep 600
+	done
+
+	brew bundle --file "$shared_dir/Brewfile" install \
 	&& brew upgrade --greedy
 }
 

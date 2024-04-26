@@ -143,7 +143,8 @@ if command -v git >/dev/null; then
 		local ret=0 out
 		if _fzf_is_git_repo; then
 			out=$(
-				git log ${=GIT_COLOR_OPTS} --date=short --format="%C(bold blue)%cd %C(auto)%h%d %s %C(green)[%an]" --graph \
+				git log ${=GIT_COLOR_OPTS} --graph --date=short \
+					--format="%C(bold blue)%cd %C(auto)%h%d %s %C(green)[%an]" \
 				| fzf ${=FZF_DEFAULT_OPTS} --height 40% --no-sort \
 					${=FZF_PREVIEW_OPTS} \
 					--preview "git show ${=GIT_COLOR_OPTS} \$(grep -o '[a-f0-9]\\{7,\\}' <<< {} | head -1)" \
@@ -158,6 +159,27 @@ if command -v git >/dev/null; then
 	zle     -N      _fzf_git_hashes
 	bindkey '^gh'   _fzf_git_hashes
 	bindkey '^gg'   _fzf_git_hashes
+
+	_fzf_git_future_hashes() {
+		setopt localoptions pipefail no_aliases 2>/dev/null
+		local ret=0 out
+		if _fzf_is_git_repo; then
+			out=$(
+				git log ${=GIT_COLOR_OPTS} --graph --date=short --all \
+					--format="%C(bold blue)%cd %C(auto)%h%d %s %C(green)[%an]" \
+				| fzf ${=FZF_DEFAULT_OPTS} --height 40% --no-sort \
+					${=FZF_PREVIEW_OPTS} \
+					--preview "git show ${=GIT_COLOR_OPTS} \$(grep -o '[a-f0-9]\\{7,\\}' <<< {} | head -1)" \
+				| grep -o '[a-f0-9]\{7,\}' | head -1
+			)
+			ret=$?
+			LBUFFER+=$out
+		fi
+		zle reset-prompt
+		return $ret
+	}
+	zle     -N      _fzf_git_future_hashes
+	bindkey '^ga'   _fzf_git_future_hashes
 
 	_fzf_git_remotes() {
 		setopt localoptions pipefail no_aliases 2>/dev/null

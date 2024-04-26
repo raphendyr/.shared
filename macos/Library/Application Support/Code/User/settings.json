@@ -5,7 +5,8 @@
   },
   "breadcrumbs.symbolPath": "off",
   "cSpell.userWords": [
-    "bouldering"
+    "bouldering",
+    "emmental"
   ],
   "coverage-gutters.coverageFileNames": [
     "lcov.info",
@@ -46,4 +47,6 @@
   "terminal.integrated.shellIntegration.enabled": false,
   "window.zoomLevel": 1,
   "workbench.editor.scrollToSwitchTabs": true,
+  "explorer.confirmDragAndDrop": false,
+  "terminal.integrated.enablePersistentSessions": false,
 }

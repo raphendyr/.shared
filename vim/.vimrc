@@ -20,7 +20,7 @@ endif
 "set compatible
 
 " define leader key
-let mapleader = ','
+let mapleader = ' '
 
 " Automatically jump to the last position
 if has("autocmd")
@@ -63,6 +63,7 @@ set modelines=4
 set showcmd         " Show (partial) command in status line.
 set showmatch       " Show matching brackets.
 set smartcase       " Do smart case matching
+set scrolloff=8     " Always show atleast 8 lines aboce and below cursors
 
 " Keybindings
 nnoremap <silent> <Leader>h :split<CR>
@@ -71,6 +72,13 @@ nnoremap <silent> <Leader>s :vsplit<CR>
 nnoremap <silent> <Leader>v :vsplit<CR>
 nnoremap <silent> <Leader>w :w<CR>
 nnoremap <silent> <Leader>f :ALEFix<CR>
+nnoremap J mzJ`z
+inoremap <A-j> <Esc>:m .+1<CR>==gi
+inoremap <A-k> <Esc>:m .-2<CR>==gi
+vnoremap J :m '>+1<CR>gv=gv
+vnoremap K :m '<-2<CR>gv=gv
+nnoremap n nzzzv
+nnoremap N Nzzzv
 " move windows with shift+arrow
 nnoremap <S-DOWN> <C-W><C-J>
 nnoremap <S-UP> <C-W><C-K>

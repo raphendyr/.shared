@@ -63,10 +63,10 @@ function +my-downloadable() {
 			esac
 			tmp=$(mktemp -d /tmp/download-drone.XXXXX) && (
 				cd "$tmp" \
-				&& +my-downloadable-download "https://github.com/drone/drone-cli/releases/latest/download/drone_${os}_amd64.tar.gz" \
+				&& +my-downloadable-download "https://github.com/drone/drone-cli/releases/latest/download/drone_${os}_${arch}.tar.gz" \
 				&& +my-downloadable-download 'https://github.com/drone/drone-cli/releases/latest/download/drone_checksums.txt' \
-				&& +my-downloadable-verify "drone_${os}_amd64.tar.gz" 'drone_checksums.txt' \
-				&& tar -zxf "drone_${os}_amd64.tar.gz" 'drone' \
+				&& +my-downloadable-verify "drone_${os}_${arch}.tar.gz" 'drone_checksums.txt' \
+				&& tar -zxf "drone_${os}_${arch}.tar.gz" 'drone' \
 				&& +my-downloadable-install 'drone' \
 				&& +my-downloadable-msg "command 'drone' ready, executing..." \
 			) || code=1
@@ -81,10 +81,10 @@ function +my-downloadable() {
 			esac
 			tmp=$(mktemp -d /tmp/download-dyff.XXXXX) && (
 				cd "$tmp" \
-				&& +my-downloadable-download "https://github.com/homeport/dyff/releases/latest/download/dyff_1.4.0_${os}_amd64.tar.gz" \
+				&& +my-downloadable-download "https://github.com/homeport/dyff/releases/latest/download/dyff_1.4.0_${os}_${arch}.tar.gz" \
 				&& +my-downloadable-download 'https://github.com/homeport/dyff/releases/latest/download/checksums.txt' \
-				&& +my-downloadable-verify "dyff_1.4.0_${os}_amd64.tar.gz" 'checksums.txt' \
-				&& tar -zxf "dyff_1.4.0_${os}_amd64.tar.gz" 'dyff' \
+				&& +my-downloadable-verify "dyff_1.4.0_${os}_${arch}.tar.gz" 'checksums.txt' \
+				&& tar -zxf "dyff_1.4.0_${os}_${arch}.tar.gz" 'dyff' \
 				&& +my-downloadable-install 'dyff' \
 				&& +my-downloadable-msg "command 'dyff' ready, executing..." \
 			) || code=1
@@ -100,8 +100,8 @@ function +my-downloadable() {
 			local version="$(curl -L -s https://dl.k8s.io/release/stable.txt)"
 			tmp=$(mktemp -d /tmp/download-kubectl.XXXXX) && (
 				cd "$tmp" \
-				&& +my-downloadable-download "https://dl.k8s.io/release/$version/bin/$os/amd64/kubectl" \
-				&& +my-downloadable-download "https://dl.k8s.io/release/$version/bin/$os/amd64/kubectl.sha256" \
+				&& +my-downloadable-download "https://dl.k8s.io/release/$version/bin/$os/${arch}/kubectl" \
+				&& +my-downloadable-download "https://dl.k8s.io/release/$version/bin/$os/${arch}/kubectl.sha256" \
 				&& +my-downloadable-verify-simple "kubectl" "kubectl.sha256" \
 				&& +my-downloadable-install 'kubectl' \
 				&& +my-downloadable-msg "command 'kubectl' ready, executing..." \
@@ -117,10 +117,10 @@ function +my-downloadable() {
 			esac
 			tmp=$(mktemp -d /tmp/download-minikube.XXXXX) && (
 				cd "$tmp" \
-				&& +my-downloadable-download "https://storage.googleapis.com/minikube/releases/latest/minikube-${os}-amd64" \
-				&& +my-downloadable-download "https://storage.googleapis.com/minikube/releases/latest/minikube-${os}-amd64.sha256" \
-				&& +my-downloadable-verify-simple "minikube-${os}-amd64" "minikube-${os}-amd64.sha256" \
-				&& mv "minikube-${os}-amd64" 'minikube' \
+				&& +my-downloadable-download "https://storage.googleapis.com/minikube/releases/latest/minikube-${os}-${arch}" \
+				&& +my-downloadable-download "https://storage.googleapis.com/minikube/releases/latest/minikube-${os}-${arch}.sha256" \
+				&& +my-downloadable-verify-simple "minikube-${os}-${arch}" "minikube-${os}-${arch}.sha256" \
+				&& mv "minikube-${os}-${arch}" 'minikube' \
 				&& +my-downloadable-install 'minikube' \
 				&& +my-downloadable-msg "command 'minikube' ready, executing..." \
 			) || code=1
@@ -138,10 +138,10 @@ function +my-downloadable() {
 			# TODO: verify sig https://releases.hashicorp.com/terraform/1.0.0/terraform_1.0.0_SHA256SUMS.sig
 			tmp=$(mktemp -d /tmp/download-terraform.XXXXX) && (
 				cd "$tmp" \
-				&& +my-downloadable-download "https://releases.hashicorp.com/terraform/${version}/terraform_${version}_${os}_amd64.zip" \
+				&& +my-downloadable-download "https://releases.hashicorp.com/terraform/${version}/terraform_${version}_${os}_${arch}.zip" \
 				&& +my-downloadable-download "https://releases.hashicorp.com/terraform/${version}/terraform_${version}_SHA256SUMS" \
-				&& +my-downloadable-verify "terraform_${version}_${os}_amd64.zip" "terraform_${version}_SHA256SUMS" \
-				&& unzip "terraform_${version}_${os}_amd64.zip" 'terraform' \
+				&& +my-downloadable-verify "terraform_${version}_${os}_${arch}.zip" "terraform_${version}_SHA256SUMS" \
+				&& unzip "terraform_${version}_${os}_${arch}.zip" 'terraform' \
 				&& +my-downloadable-install 'terraform' \
 				&& +my-downloadable-msg "command 'terraform' ready, executing..." \
 			) || code=1

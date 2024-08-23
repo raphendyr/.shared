@@ -8,7 +8,7 @@ function +my-downloadable-download() {
 	local url="$1"
 	local fn="${2:-${url##*/}}"
 	+my-downloadable-msg "downloading $url"
-	curl -LsS -o "$fn" "$url"
+	curl -LfsS -o "$fn" "$url"
 }
 
 function +my-downloadable-verify() {
@@ -28,93 +28,84 @@ function +my-downloadable-install() {
 }
 
 function +my-downloadable() {
-	local code=0 os="" arch="" version="" tmp=""
-	arch='amd64'
+	local code=0 os="" arch="" version="" github_download="" tmp=""
+	case "$OSTYPE" in
+		darwin*) os="darwin" ;;
+		linux*) os="linux" ;;
+		*) +my-downloadable-msg "Unknown OS '$OSTYPE'." ; return 1 ;;
+	esac
+	case "$(uname -m)" in
+		x86_64) arch='amd64' ;;
+		*) +my-downloadable-msg "Unknown CPU architecture '$(uname -m)'." ; return 1 ;;
+	esac
+	version="${2:-}"
+	if [[ -z $version ]]; then version='latest'; fi
+	if [[ ${version#v} == "$version" && $version != 'latest' ]]; then version="v$version"; fi
+	if [[ $version = 'latest' ]]
+		then github_download='latest/download'
+		else github_download="download/$version"
+	fi
+
 	case "$1" in
 		'')
-			echo "usage: $0 <binary>" >&2
+			echo "usage: $0 <binary> [version]" >&2
 			return 64
 			;;
 		argocd)
-			#version='latest'
-			version='v2.7.10'
-			case "$OSTYPE" in
-				darwin*) os="darwin" ;;
-				linux*) os="linux" ;;
-				*) +my-downloadable-msg "Unknown OS '$OSTYPE' for argocd." ; return 1 ;;
-			esac
 			tmp=$(mktemp -d /tmp/download-argocd.XXXXX) && (
 				cd "$tmp" \
-				&& +my-downloadable-download "https://github.com/argoproj/argo-cd/releases/download/${version}/argocd-${os}-${arch}" \
-				&& +my-downloadable-download "https://github.com/argoproj/argo-cd/releases/download/${version}/cli_checksums.txt" \
+				&& +my-downloadable-download "https://github.com/argoproj/argo-cd/releases/$github_download/argocd-${os}-${arch}" \
+				&& +my-downloadable-download "https://github.com/argoproj/argo-cd/releases/$github_download/cli_checksums.txt" \
 				&& +my-downloadable-verify "argocd-${os}-${arch}" 'cli_checksums.txt' \
 				&& mv "argocd-${os}-${arch}" 'argocd' \
 				&& +my-downloadable-install 'argocd' \
-				&& +my-downloadable-msg "command 'argocd' ready, executing..." \
 			) || code=1
 			if [ "$tmp" -a -d "$tmp" ]; then rm -r "$tmp"; fi
 			return $code
 			;;
 		drone)
-			case "$OSTYPE" in
-				darwin*) os="darwin" ;;
-				linux*) os="linux" ;;
-				*) +my-downloadable-msg "Unknown OS '$OSTYPE' for drone." ; return 1 ;;
-			esac
 			tmp=$(mktemp -d /tmp/download-drone.XXXXX) && (
 				cd "$tmp" \
-				&& +my-downloadable-download "https://github.com/drone/drone-cli/releases/latest/download/drone_${os}_${arch}.tar.gz" \
-				&& +my-downloadable-download 'https://github.com/drone/drone-cli/releases/latest/download/drone_checksums.txt' \
+				&& +my-downloadable-download "https://github.com/harness/drone-cli/releases/$github_download/drone_${os}_${arch}.tar.gz" \
+				&& +my-downloadable-download "https://github.com/harness/drone-cli/releases/$github_download/drone_checksums.txt" \
 				&& +my-downloadable-verify "drone_${os}_${arch}.tar.gz" 'drone_checksums.txt' \
 				&& tar -zxf "drone_${os}_${arch}.tar.gz" 'drone' \
 				&& +my-downloadable-install 'drone' \
-				&& +my-downloadable-msg "command 'drone' ready, executing..." \
 			) || code=1
 			if [ "$tmp" -a -d "$tmp" ]; then rm -r "$tmp"; fi
 			return $code
 			;;
 		dyff)
-			case "$OSTYPE" in
-				darwin*) os="darwin" ;;
-				linux*) os="linux" ;;
-				*) +my-downloadable-msg "Unknown OS '$OSTYPE' for dyff." ; return 1 ;;
-			esac
+			if [[ $version = 'latest' ]]; then
+				version=$(curl -LfsS 'https://api.github.com/repos/homeport/dyff/releases/latest' \
+					| jq -r '.tag_name')
+			fi
 			tmp=$(mktemp -d /tmp/download-dyff.XXXXX) && (
 				cd "$tmp" \
-				&& +my-downloadable-download "https://github.com/homeport/dyff/releases/latest/download/dyff_1.4.0_${os}_${arch}.tar.gz" \
-				&& +my-downloadable-download 'https://github.com/homeport/dyff/releases/latest/download/checksums.txt' \
-				&& +my-downloadable-verify "dyff_1.4.0_${os}_${arch}.tar.gz" 'checksums.txt' \
-				&& tar -zxf "dyff_1.4.0_${os}_${arch}.tar.gz" 'dyff' \
+				&& +my-downloadable-download "https://github.com/homeport/dyff/releases/download/$version/dyff_${version#v}_${os}_${arch}.tar.gz" \
+				&& +my-downloadable-download "https://github.com/homeport/dyff/releases/download/$version/checksums.txt" \
+				&& +my-downloadable-verify "dyff_${version#v}_${os}_${arch}.tar.gz" 'checksums.txt' \
+				&& tar -zxf "dyff_${version#v}_${os}_${arch}.tar.gz" 'dyff' \
 				&& +my-downloadable-install 'dyff' \
-				&& +my-downloadable-msg "command 'dyff' ready, executing..." \
 			) || code=1
 			if [ "$tmp" -a -d "$tmp" ]; then rm -r "$tmp"; fi
 			return $code
 			;;
 		kubectl)
-			case "$OSTYPE" in
-				darwin*) os="darwin" ;;
-				linux*) os="linux" ;;
-				*) +my-downloadable-msg "Unknown OS '$OSTYPE' for minikube." ; return 1 ;;
-			esac
-			local version="$(curl -L -s https://dl.k8s.io/release/stable.txt)"
+			if [[ $version = 'latest' ]]; then
+				version=$(curl -LfsS https://dl.k8s.io/release/stable.txt)
+			fi
 			tmp=$(mktemp -d /tmp/download-kubectl.XXXXX) && (
 				cd "$tmp" \
 				&& +my-downloadable-download "https://dl.k8s.io/release/$version/bin/$os/${arch}/kubectl" \
 				&& +my-downloadable-download "https://dl.k8s.io/release/$version/bin/$os/${arch}/kubectl.sha256" \
 				&& +my-downloadable-verify-simple "kubectl" "kubectl.sha256" \
 				&& +my-downloadable-install 'kubectl' \
-				&& +my-downloadable-msg "command 'kubectl' ready, executing..." \
 			) || code=1
 			if [ "$tmp" -a -d "$tmp" ]; then rm -r "$tmp"; fi
 			return $code
 			;;
 		minikube)
-			case "$OSTYPE" in
-				darwin*) os="darwin" ;;
-				linux*) os="linux" ;;
-				*) +my-downloadable-msg "Unknown OS '$OSTYPE' for minikube." ; return 1 ;;
-			esac
 			tmp=$(mktemp -d /tmp/download-minikube.XXXXX) && (
 				cd "$tmp" \
 				&& +my-downloadable-download "https://storage.googleapis.com/minikube/releases/latest/minikube-${os}-${arch}" \
@@ -122,17 +113,11 @@ function +my-downloadable() {
 				&& +my-downloadable-verify-simple "minikube-${os}-${arch}" "minikube-${os}-${arch}.sha256" \
 				&& mv "minikube-${os}-${arch}" 'minikube' \
 				&& +my-downloadable-install 'minikube' \
-				&& +my-downloadable-msg "command 'minikube' ready, executing..." \
 			) || code=1
 			if [ "$tmp" -a -d "$tmp" ]; then rm -r "$tmp"; fi
 			return $code
 			;;
 		terraform)
-			case "$OSTYPE" in
-				darwin*) os="darwin" ;;
-				linux*) os="linux" ;;
-				*) +my-downloadable-msg "Unknown OS '$OSTYPE' for minikube." ; return 1 ;;
-			esac
 			# TODO: dynamic version
 			local version="1.0.0"
 			# TODO: verify sig https://releases.hashicorp.com/terraform/1.0.0/terraform_1.0.0_SHA256SUMS.sig
@@ -143,7 +128,6 @@ function +my-downloadable() {
 				&& +my-downloadable-verify "terraform_${version}_${os}_${arch}.zip" "terraform_${version}_SHA256SUMS" \
 				&& unzip "terraform_${version}_${os}_${arch}.zip" 'terraform' \
 				&& +my-downloadable-install 'terraform' \
-				&& +my-downloadable-msg "command 'terraform' ready, executing..." \
 			) || code=1
 			if [ "$tmp" -a -d "$tmp" ]; then rm -r "$tmp"; fi
 			return $code
@@ -168,6 +152,7 @@ for _binary in \
 			if +my-downloadable "$0"; then
 				unset -f "$0"
 				rehash
+				+my-downloadable-msg "command '$0' ready, executing..." \
 				"$0" "$@"
 			else
 				return $?

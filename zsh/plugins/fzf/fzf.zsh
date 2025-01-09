@@ -103,7 +103,8 @@ if command -v git >/dev/null; then
 		local ret=0 out
 		if _fzf_is_git_repo; then
 			out=$(
-				git branch -a ${=GIT_COLOR_OPTS} | grep -v '/HEAD\s' \
+				git branch -a --sort=committerdate ${=GIT_COLOR_OPTS} \
+				| grep -vE '/HEAD([^[:print:]]|[[:space:]])' \
 				| fzf ${=FZF_DEFAULT_OPTS} --height 40% --multi --tac \
 					--preview-window right:70% ${=FZF_PREVIEW_OPTS} \
 					--preview "git log -48 --oneline --graph --date=short ${=GIT_COLOR_OPTS} --pretty='format:%C(bold blue)%cd %C(auto)%h%d %s' \$(sed -e 's/^\*//' -e 's/^[[:space:]]*//' <<< {})" \

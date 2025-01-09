@@ -28,6 +28,9 @@ defaults write -g AppleTemperatureUnit "Celsius"
 # window
 defaults write -g NSWindowSupportsAutomaticInlineTitle -bool false
 
+# handoff / sharing clipboard
+defaults write com.apple.coreservices.useractivityd.plist ClipboardSharingEnabled 0
+
 ## Homebrew, binaries and apps
 
 if ! which brew > /dev/null; then

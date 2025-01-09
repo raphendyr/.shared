@@ -5,8 +5,12 @@
   },
   "breadcrumbs.symbolPath": "off",
   "cSpell.userWords": [
+    "behaviour",
     "bouldering",
-    "emmental"
+    "elif",
+    "emmental",
+    "healthcheck",
+    "Quadlet"
   ],
   "coverage-gutters.coverageFileNames": [
     "lcov.info",
@@ -49,4 +53,14 @@
   "workbench.editor.scrollToSwitchTabs": true,
   "explorer.confirmDragAndDrop": false,
   "terminal.integrated.enablePersistentSessions": false,
+  "yaml.format.enable": false,
+  "shellcheck.useWorkspaceRootAsCwd": true,
+  "files.associations": {
+    "ssh_config": "plaintext"
+  },
+  "extensions.ignoreRecommendations": true,
+  "diffEditor.ignoreTrimWhitespace": false,
+  "editor.acceptSuggestionOnCommitCharacter": false,
+  "database-client.autoSync": true,
+  "database-client.telemetry.usesOnlineServices": false,
 }

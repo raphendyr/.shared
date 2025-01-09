@@ -31,12 +31,26 @@ group_grep() {
 	#    for l, c in sorted(data[f]):
 	#        print("  %4d: %s" % (l, c))' -
 	awk -F: '
+BEGIN { files = 0; }
 {
-  if ($1 != prev) print $1;
+  if ($1 != prev) {
+    if (files > 30) {
+      print "... ...";
+	  exit;
+    }
+    print $1;
+    count = 0;
+    files++;
+  };
   prev = $1; $1 = "";
   ln = $2; $2 = "";
-  gsub(/^[[:space:]]*/, "");
-  printf("  %4d: %s\n", ln, $0);
+  if (count < 8) {
+    gsub(/^[[:space:]]*/, "");
+	printf("  %4d: %s\n", ln, substr($0, 1, 75));
+  } else if (count == 8) {
+	print "   ...";
+  }
+  count++;
 }'
 }
 

@@ -1,6 +1,7 @@
 # Before loading nvm plugin
 export NVM_DIR="$HOME/.local/share/nvm"
 NVM_LAZY_LOAD=true
+NVM_LAZY_LOAD_EXTRA_COMMANDS=(npm node)
 NVM_COMPLETION=true
 
 function +zsh-nvm-precmd() {

@@ -9,6 +9,7 @@
 	f = fetch
 	fix = commit --fixup
 	fp = fetch --prune
+	grep-blame = "!g() { git -P grep -n $1 $2 | while IFS=: read -r file line _match; do git -P blame -f -L $line,$line $file; done; }; g"
 	l = lol
 	lol = !git log --graph --decorate --abbrev-commit --all --pretty='format:%C(auto)%h %d %s %C(green)[%an] %C(bold blue)%ad' --date=relative || true
 	ls-ignored = ls-files -o -i --exclude-standard

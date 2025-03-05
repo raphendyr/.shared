@@ -18,19 +18,35 @@
 	s = status --short
 	st = status
 	sw = switch
+
+[advice]
+	skippedCherryPicks = false
+[branch]
+	sort = committerdate
 [color]
 	ui = auto
 [core]
 	excludesFile = ~/.config/git/ignore
 	hooksPath = ~/.config/git/hooks
-[advice]
-	skippedCherryPicks = false
+[diff]
+	algorithm = histogram
+	colorMoved = zebra # blocks, or plain
+	mnemonicPrefix = true
+	renames = true
+[grep]
+	patternType = perl
 [init]
 	defaultBranch = main
 [pull]
 	ff = only
 [push]
 	default = upstream
+[rebase]
+	# autoSquash = true
+	# autoStash = true
+	# updateRefs = true
+[tag]
+	sort = version:refname
 [user]
 	name = Jaakko Kantojärvi
 	email = jaakko@n-1.fi

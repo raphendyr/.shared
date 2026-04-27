@@ -73,7 +73,7 @@ while read local_ref local_sha remote_ref remote_sha; do
 		if [ "$local_sha" = "$(git rev-parse HEAD)" ] \
 			&& ! "$scripts/prepare-commit-msg" "" pre-push "$range" >&2
 		then
-			case "${ALLOW_FIXME:-no}" in
+			case "${ALLOW_FIXME:-${ALLOW_WIP:-no}}" in
 				y|yes|true|1)
 					;;
 				*)

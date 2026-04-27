@@ -1,10 +1,35 @@
 #!/bin/sh
 
+if command -v gawk >/dev/null; then
+	awk() { gawk "$@"; }
+fi
+
 docker container prune -f
 
-if [ "$1" = "-d" ]; then
-    docker image ls|awk '/^[^[:space:]]+\s+([a-zA-Z0-9.-]+[_-]|)dev\s+/ {print $3}'|xargs -r docker image rm
-fi
-docker image ls|awk '/^[^[:space:]]+\s+[a-zA-Z0-9.-]+[_-]old\s+/ {print $3}'|xargs -r docker image rm
+while [ $# -gt 0 ]; do
+	case "$1" in
+		-d)
+			docker image ls \
+			| awk '$2 ~ /^(.+[_-])?dev$/ {print $3}' \
+			| xargs -r docker image rm
+			;;
+		-v)
+			if [ "$2" ]; then
+				age=$2
+				shift
+			else
+				age=1y
+			fi
+			date=$(date -v "-$age" +'%F')
+			docker image prune --all --filter="until=$date"
+			;;
+	esac
+	shift
+done
 
+docker image ls \
+| awk '$2 ~ /^.+[_-]old$/ {print $3}' \
+| xargs -r docker image rm
+
+docker builder prune -f --filer=until=14h
 docker image prune -f

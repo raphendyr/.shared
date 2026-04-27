@@ -1,4 +1,6 @@
 *~
 .*.swp
+.$*.bkp
 
 /.env
+/*.code-workspace

@@ -39,11 +39,18 @@ mas_upgrade() {
 	fi
 }
 
-set -x
-if brew_upgrade && mas_upgrade; then
-	echo "All done!"
-else
-	echo "Something failed! Please fix."
-fi
-echo "  Press enter to exit.."
-read -r reply
+while :; do
+	if (set -x; brew_upgrade && mas_upgrade); then
+		echo
+		echo "All done!"
+		echo "  Press [enter] to exit.."
+		read -r reply
+		break
+	else
+		echo
+		echo "Something failed! Please fix."
+		echo "  Press [enter] to retry or write anything to exit..."
+		read -r reply
+		if [ "$reply" ]; then break; fi
+	fi
+done

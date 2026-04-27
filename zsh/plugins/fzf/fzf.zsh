@@ -107,8 +107,8 @@ if command -v git >/dev/null; then
 				| grep -vE '/HEAD([^[:print:]]|[[:space:]])' \
 				| fzf ${=FZF_DEFAULT_OPTS} --height 40% --multi --tac \
 					--preview-window right:70% ${=FZF_PREVIEW_OPTS} \
-					--preview "git log -48 --oneline --graph --date=short ${=GIT_COLOR_OPTS} --pretty='format:%C(bold blue)%cd %C(auto)%h%d %s' \$(sed -e 's/^\*//' -e 's/^[[:space:]]*//' <<< {})" \
-				| sed -e 's/^\*//' -e 's/^[[:space:]]*//' -e 's#^remotes/[^/]*/##'
+					--preview "git log -48 --oneline --graph --date=short ${=GIT_COLOR_OPTS} --pretty='format:%C(bold blue)%cd %C(auto)%h%d %s' \$(sed -e 's/^[*+]//' -e 's/^[[:space:]]*//' <<< {})" \
+				| sed -e 's/^[*+]//' -e 's/^[[:space:]]*//' -e 's#^remotes/[^/]*/##'
 			)
 			ret=$?
 			LBUFFER+=$out

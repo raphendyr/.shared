@@ -14,6 +14,7 @@
 	lol = !git log --graph --decorate --abbrev-commit --all --pretty='format:%C(auto)%h %d %s %C(green)[%an] %C(bold blue)%ad' --date=relative || true
 	ls-ignored = ls-files -o -i --exclude-standard
 	p = push
+	pr = "!g() { if [ -z \"${1:-}\" -o -z \"${2:-}\" ]; then echo 'usage: git pr <remote> <pr-number>'; return 1; fi; git fetch $1 pull/$2/head:pr-$2 && git switch pr-$2; }; g"
 	re = "!g() { git rebase -i --autostash --autosquash --update-refs $(git merge-base \"${1:-origin/HEAD}\" HEAD); }; g"
 	reto = "!g() { git rebase --autostash --autosquash --update-refs \"${1:-origin/HEAD}\"; }; g"
 	s = status --short

@@ -12,13 +12,22 @@ function +my-downloadable-download() {
 }
 
 function +my-downloadable-verify() {
-	local fn="$1" sums="$2"
-	awk '$2 ~ /'"$fn"'/ {print $1 " " "'"$fn"'"}' "$sums" | sha256sum -c -
+	set -x
+	local fn="$1" sumfn="$2" sha256
+	if ! [[ -e $fn ]]; then +my-downloadable-msg "File not found '$fn'."; return 1; fi
+	if ! [[ -e $sumfn ]]; then +my-downloadable-msg "File not found '$sumfn'."; return 1; fi
+	sha256=$(awk '$2 ~ /'"$fn"'/ {print $1}' "$sumfn")
+	if [[ -z $sha256 ]]; then +my-downloadable-msg "File doesn't contain a hash for the file: $fn not in $sumfn"; return 1; fi
+	sha256sum -c - <<< "$sha256 $fn"
 }
 
 function +my-downloadable-verify-simple() {
-	local fn="$1" sum="$2"
-	echo "$(head -n1 "$sum") $fn" | sha256sum -c -
+	local fn="$1" sumfn="$2" sha256
+	if ! [[ -e "$fn" ]]; then +my-downloadable-msg "File not found '$fn'." ; return 1 ; fi
+	if ! [[ -e "$sumfn" ]]; then +my-downloadable-msg "File not found '$sumfn'." ; return 1 ; fi
+	sha256=$(head -n1 "$sumfn")
+	if [[ -z $sha256 ]]; then +my-downloadable-msg "File doesn't contain a hash for the file: $fn not in $sumfn"; return 1; fi
+	sha256sum -c - <<< "$sha256 $fn"
 }
 
 function +my-downloadable-install() {
@@ -152,7 +161,7 @@ for _binary in \
 			if +my-downloadable "$0"; then
 				unset -f "$0"
 				rehash
-				+my-downloadable-msg "command '$0' ready, executing..." \
+				+my-downloadable-msg "command '$0' ready, executing..."
 				"$0" "$@"
 			else
 				return $?

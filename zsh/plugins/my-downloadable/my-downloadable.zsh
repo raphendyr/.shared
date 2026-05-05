@@ -12,7 +12,6 @@ function +my-downloadable-download() {
 }
 
 function +my-downloadable-verify() {
-	set -x
 	local fn="$1" sumfn="$2" sha256
 	if ! [[ -e $fn ]]; then +my-downloadable-msg "File not found '$fn'."; return 1; fi
 	if ! [[ -e $sumfn ]]; then +my-downloadable-msg "File not found '$sumfn'."; return 1; fi
@@ -59,6 +58,27 @@ function +my-downloadable() {
 		'')
 			echo "usage: $0 <binary> [version]" >&2
 			return 64
+			;;
+		airlock)
+			if [[ $version = 'latest' ]]; then
+				version=$(curl -LfsS 'https://api.github.com/repos/milankinen/airlock/releases/latest' \
+					| jq -r '.tag_name')
+			fi
+			case "$arch" in
+				amd64) arch='x86_64' ;;
+			esac
+			# bundled | distroless
+			variant='bundled'
+			tmp=$(mktemp -d /tmp/download-airlock.XXXXX) && (
+				cd "$tmp" \
+				&& +my-downloadable-download "https://github.com/milankinen/airlock/releases/download/$version/airlock-${version}-${os}-${arch}-${variant}.tar.gz" \
+				&& +my-downloadable-download "https://github.com/milankinen/airlock/releases/download/$version/airlock-${version}-${os}-${arch}-${variant}.tar.gz.sha256" \
+				&& +my-downloadable-verify "airlock-${version}-${os}-${arch}-${variant}.tar.gz" "airlock-${version}-${os}-${arch}-${variant}.tar.gz.sha256" \
+				&& tar -zxf "airlock-${version}-${os}-${arch}-${variant}.tar.gz" 'airlock' \
+				&& +my-downloadable-install 'airlock' \
+			) || code=1
+			if [ "$tmp" -a -d "$tmp" ]; then rm -r "$tmp"; fi
+			return $code
 			;;
 		argocd)
 			tmp=$(mktemp -d /tmp/download-argocd.XXXXX) && (
@@ -149,6 +169,7 @@ function +my-downloadable() {
 }
 
 for _binary in \
+	airlock \
 	argocd \
 	drone \
 	dyff \

@@ -30,9 +30,12 @@ function +my-downloadable-verify-simple() {
 }
 
 function +my-downloadable-install() {
-	local fn="$1"
-	mv "$fn" "$HOME/.local/bin/$fn"
-	chmod +x "$HOME/.local/bin/$fn"
+	local src="$1" bin=${2:-}
+	if [[ -z $target ]]; then
+		target=${src##*/}
+	fi
+	cp "$src" "$HOME/.local/bin/$bin"
+	chmod +x "$HOME/.local/bin/$bin"
 }
 
 function +my-downloadable() {
@@ -146,6 +149,25 @@ function +my-downloadable() {
 			if [ "$tmp" -a -d "$tmp" ]; then rm -r "$tmp"; fi
 			return $code
 			;;
+		mise)
+			if [[ $version = 'latest' ]]; then
+				version=$(curl -LfsS 'https://api.github.com/repos/jdx/mise/releases/latest' \
+					| jq -r '.tag_name')
+			fi
+			case "$arch" in
+				amd64) arch='x64' ;;
+			esac
+			tmp=$(mktemp -d /tmp/download-airlock.XXXXX) && (
+				cd "$tmp" \
+				&& +my-downloadable-download "https://github.com/jdx/mise/releases/download/$version/mise-${version}-${os}-${arch}.tar.xz" \
+				&& +my-downloadable-download "https://github.com/jdx/mise/releases/download/$version/SHASUMS256.txt" \
+				&& +my-downloadable-verify "mise-${version}-${os}-${arch}.tar.xz" 'SHASUMS256.txt' \
+				&& tar -Jxf "mise-${version}-${os}-${arch}.tar.xz" 'mise' \
+				&& +my-downloadable-install 'mise/bin/mise' 'mise' \
+			) || code=1
+			if [ "$tmp" -a -d "$tmp" ]; then rm -r "$tmp"; fi
+			return $code
+			;;
 		terraform)
 			# TODO: dynamic version
 			local version="1.0.0"
@@ -175,6 +197,7 @@ for _binary in \
 	dyff \
 	kubectl \
 	minikube \
+	mise \
 	terraform \
 ; do
 	if ! command -v "$_binary" >/dev/null; then

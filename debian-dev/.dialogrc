@@ -1,0 +1,88 @@
+# Run-time configuration file for dialog
+# Number     -  <number>
+# String     -  "string"
+# Boolean    -  <ON|OFF>
+# Attribute  -  (foreground,background,highlight?)
+
+# Set aspect-ration.
+aspect = 0
+# Set separator (for multiple widgets output).
+separate_widget = ""
+# Set tab-length (for textbox tab-conversion).
+tab_len = 2
+# Make tab-traversal for checklist, etc., include the list.
+visit_items = OFF
+
+# Shadow dialog boxes? This also turns on color.
+use_shadow = ON
+use_colors = ON
+
+# Screen color
+screen_color = (GREEN,BLACK,ON)
+# Dialog text color
+title_color = (GREEN,BLACK,ON)
+dialog_color = (WHITE,BLACK,ON)
+# Dialog border (1: top/left, 2: right/bottom)
+border_color = (BLACK,BLACK,ON)
+border2_color = (WHITE,BLACK,OFF)
+shadow_color = (BLACK,BLACK,ON)
+
+# Active button color (the < and > markers)
+button_active_color = (BLACK,YELLOW,OFF)
+# Active button key color (reverted on focused button)
+button_key_active_color = button_active_color
+# Active button label color
+button_label_active_color = button_key_active_color
+# Inactive button color
+button_inactive_color = (WHITE,BLACK,OFF)
+# Inactive button key color
+button_key_inactive_color = (RED,BLACK,ON)
+# Inactive button label color
+button_label_inactive_color = (WHITE,BLACK,ON)
+
+# Item color
+item_color = (WHITE,BLACK,ON)
+item_selected_color = (YELLOW,BLACK,OFF)
+# Item help-text color (printed on bottom left on the screen area)
+itemhelp_color = screen_color
+
+# Check box color
+check_color = item_color
+check_selected_color = button_label_active_color
+
+# Input box color
+inputbox_color = dialog_color
+inputbox_border_color = border_color
+inputbox_border2_color = border2_color
+
+# Form / Edit
+form_text_color = (WHITE,BLACK,ON)
+form_active_text_color = (YELLOW,BLACK,ON)
+form_item_readonly_color = (WHITE,BLACK,OFF)
+
+# Tag color (in multiple widgets)
+tag_color = button_label_inactive_color
+tag_selected_color = button_label_active_color
+tag_key_color = button_key_inactive_color
+tag_key_selected_color = button_key_active_color
+
+# Menu box color
+# - form labels
+# - calendar weekdays and week numbers
+menubox_color = (GREEN,BLACK,ON)
+menubox_border_color = inputbox_border_color
+menubox_border2_color = inputbox_border2_color
+
+# Search box color
+searchbox_color = form_active_text_color
+searchbox_title_color = menubox_color
+searchbox_border_color = inputbox_border_color
+searchbox_border2_color = inputbox_border2_color
+
+# Up/Down arrow colors + position indicator
+uarrow_color = title_color
+darrow_color = uarrow_color
+position_indicator_color = uarrow_color
+
+# Dialog box gauge color
+gauge_color = item_color

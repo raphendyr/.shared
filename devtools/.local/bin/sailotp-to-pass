@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+
+if ! [ -e "$1" ]; then
+	echo "File doesn't exists '$1'" >&2
+	exit 1
+fi
+
+set -eu -o pipefail
+
+openssl aes-256-cbc -d -a -v -in "$1" \
+| jq -r '(.otplist | map([.secret, .counter, .diff, .len, .period, .type, .title]))[] | @tsv ' \
+| while read -r secret _counter _diff len period type title; do
+	otptitle=${title// /%20}
+	if [[ "$type" = 'TOTP_STEAM' ]]; then
+		issuer="Steam"
+		key="steam"
+		url="otpauth://totp/$otptitle?secret=$secret&issuer=$issuer"
+	elif [[ "$type" = 'TOTP' ]]; then
+		issuer=
+		if [[ $title = foobar ]]; then
+			issuer="foobar issuer"
+			key="import-foobar"
+		else
+			key="$(echo "$title" | tr '[:upper:]' '[:lower:]' | sed -e 's/ /_/g')"
+		fi
+		url="otpauth://totp/$otptitle?secret=$secret&algorithm=SHA1&digits=$len&period=$period&${issuer:+issuer=}$issuer"
+	else
+		echo "ERROR unsupported type $type for $title"
+		continue
+	fi
+	if [ -e "$HOME/.password-store/$key.gpg" ]; then
+		echo "$key exists, skipping"
+		continue
+	fi
+	pass insert --multiline "$key" <<EOF
+
+$url
+EOF
+done

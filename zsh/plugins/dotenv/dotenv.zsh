@@ -24,7 +24,7 @@ _ZSH_DOTENV_STACK_TOP_WD=
 # utils
 
 +dotenv-debug() {
-	local ps=$PS4
+	local ps=$PS4 value
 	if [[ -z $ZSH_DOTENV_QUIET ]]; then
 		[[ $ps == *%x* ]] && ps=${ps//\%x/[dotenv]} || ps=${ps/+/+[dotenv]}
 		while [[ $# > 0 ]]; do
@@ -35,7 +35,11 @@ _ZSH_DOTENV_STACK_TOP_WD=
 			esac
 			shift
 		done
-		printf "%s %s\n" "${(%)ps}" "$(sed -E 's/(PASSWORD|SECRET|TOKEN)=('"'[^']*'"'|"[^"]*"|[^[:space:]"'\'']*)/\1= [hidden] /g' <<< "$*")"
+		value="$(sed -E \
+			-e 's/(PASSWORD|SECRET|TOKEN)=('"'[^']*'"'|"[^"]*"|[^[:space:]"'\'']*)/\1=[hidden]/g' \
+			-e 's|([A-Z0-9_])=(.*https?://)([a-zA-Z0-9@._-]+:[a-zA-Z0-9._-]+)(@.+)|\1=\2[hidden]\4|g' \
+			<<< "$*")"
+		printf "%s %s\n" "${(%)ps}" "$value"
 	fi
 }
 

@@ -8,6 +8,7 @@ shared_dir=$(cd ~/.local/bin; f=$(readlink "setup-macos.sh"); cd "${f%/*}/../.."
 git_root=$(cd "$shared_dir/.."; echo "$PWD")
 
 export HOMEBREW_NO_AUTO_UPDATE=1
+export HOMEBREW_BUNDLE_NO_DESCRIBE=1
 
 brew bundle --file "$shared_dir/Brewfile" --force dump
 

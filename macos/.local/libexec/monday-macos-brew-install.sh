@@ -11,6 +11,8 @@ shared_dir=$(
 )
 
 export HOMEBREW_NO_AUTO_UPDATE=1
+export HOMEBREW_NO_ASK=1
+export HOMEBREW_DOWNLOAD_CONCURRENCY=1
 # these packages handle updates well (use space to separate)
 export HOMEBREW_BUNDLE_CASK_SKIP="telegram"
 
@@ -38,6 +40,11 @@ mas_upgrade() {
 		mas upgrade
 	fi
 }
+
+echo "Currently pinned packages:"
+echo "--------------------------"
+brew list --pinned || true
+echo "--------------------------"
 
 while :; do
 	if (set -x; brew_upgrade && mas_upgrade); then

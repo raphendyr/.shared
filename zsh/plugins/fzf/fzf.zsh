@@ -223,17 +223,20 @@ if command -v git >/dev/null; then
 
 	git-history() {
 		setopt localoptions pipefail no_aliases 2>/dev/null
-		local ret=0 out relative=x
+		local ret=0 out relative=x branch=
 		while [[ $# -gt 0 ]]; do
 			case "$1" in
 				-r) relative=x ;;
 				-R) relative= ;;
+				-*) echo "invalid option: $1" ; return 1 ;;
+				*) branch=$1 ; break ;;
 			esac
 			shift
 		done
 		out=$(
-			git log ${=GIT_COLOR_OPTS} --graph --decorate --abbrev-commit --all \
+			git log ${=GIT_COLOR_OPTS} --graph --decorate --abbrev-commit \
 				--pretty='format:%C(auto)%h %d %s %C(green)[%an] %C(bold blue)%ad' ${relative:+--date=relative} \
+				"${branch:---all}" "$@" \
 			| fzf ${=FZF_DEFAULT_OPTS} --no-sort \
 				${=FZF_PREVIEW_OPTS} \
 				--preview "git show $GIT_COLOR_OPTS \$(grep -o '[a-f0-9]\\{7,\\}' <<< {} | head -1)" \

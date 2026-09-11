@@ -52,6 +52,14 @@ if type -p pwqgen >/dev/null; then
 		if [ -z "$*" ]; then set -- random=64 ; fi
 		command pwqgen "$@";
 	}
+elif type -p docker >/dev/null; then
+	pwqgen() {
+		docker run --rm -it -e DEBIAN_FRONTEND=noninteractive debian \
+			/bin/bash -c '\
+{ apt-get update -qyy && apt-get install -yy passwdqc; } >/dev/null; \
+if [ -z "$*" ]; then set -- random=64 ; fi; \
+for i in `seq 5`; do pwqgen "$@"; done' - "$@"
+	}
 fi
 
 

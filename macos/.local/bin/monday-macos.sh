@@ -4,7 +4,7 @@
 
 set -eu
 
-shared_dir=$(cd ~/.local/bin; f=$(readlink "setup-macos.sh"); cd "${f%/*}/../.."; echo "$PWD")
+shared_dir=$(cd ~/.local/bin; f=$(readlink "monday-macos.sh"); cd "${f%/*}/../.."; echo "$PWD")
 git_root=$(cd "$shared_dir/.."; echo "$PWD")
 
 export HOMEBREW_NO_AUTO_UPDATE=1

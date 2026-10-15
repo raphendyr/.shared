@@ -12,6 +12,7 @@ shared_dir=$(
 
 export HOMEBREW_NO_AUTO_UPDATE=1
 export HOMEBREW_NO_ASK=1
+# number: auto, 1..N
 export HOMEBREW_DOWNLOAD_CONCURRENCY=1
 # these packages handle updates well (use space to separate)
 export HOMEBREW_BUNDLE_CASK_SKIP="telegram"
@@ -27,7 +28,7 @@ brew_upgrade() {
 		sleep 600
 	done
 
-	brew bundle --file "$shared_dir/Brewfile" install \
+	brew bundle --verbose --file "$shared_dir/Brewfile" install \
 	&& brew upgrade --greedy
 }
 

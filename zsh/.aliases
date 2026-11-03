@@ -86,6 +86,14 @@ if type -p crc >/dev/null; then
 		if command -v rehash >/dev/null; then rehash; fi
 		command oc "$@"
 	}
+	podman-in-crc() {
+		local sshkey host
+		sshkey="$HOME/.crc/machines/crc/id_ed25519"
+		host="ssh://core@127.0.0.1:2222/run/user/1000/podman/podman.sock"
+		podman system connection add crc --default --identity "$sshkey" "$host"
+		export REGISTRY_AUTH_FILE="$HOME/.config/containers/auth-crc.json"
+		podman context inspect crc
+	}
 fi
 
 

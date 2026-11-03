@@ -41,15 +41,17 @@ if has("autocmd")
     filetype plugin indent on
 
     " Makefile sanity
-    autocmd BufNewFile,BufRead ?akefile* set noet ts=4 sw=4
-    autocmd BufNewFile,BufRead */debian/rules set noet ts=4 sw=4
-    autocmd BufNewFile,BufRead */debian/control* set noet ts=4 sw=4 textwidth=74 colorcolumn=75
+    autocmd BufNewFile,BufRead ?akefile* setf make
+    autocmd BufNewFile,BufRead */debian/rules setf make
+    autocmd BufNewFile,BufRead */debian/control* setf debcontrol
+    autocmd FileType make setlocal noet ts=4 sw=4
+    autocmd FileType debcontrol setlocal noet ts=4 sw=4 textwidth=74 colorcolumn=75
     " Special Dockerfile matches
     autocmd BufNewFile,BufRead Dockerfile.* setf dockerfile
     " Some json files are really json5 files
-    autocmd BufNewFile,BufRead tsconfig.json set ft=json5 ts=2 sw=2
+    autocmd BufNewFile,BufRead tsconfig.json setlocal ft=json5 ts=2 sw=2
     " Special Erlang relatex lexer/parser files
-    autocmd BufNewFile,BufRead *.[xy]rl set ft=erlang ts=2 sw=2
+    autocmd BufNewFile,BufRead *.[xy]rl setlocal ft=erlang ts=2 sw=2
 endif
 
 " Fancy features

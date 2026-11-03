@@ -52,6 +52,8 @@ if has("autocmd")
     autocmd BufNewFile,BufRead tsconfig.json setlocal ft=json5 ts=2 sw=2
     " Special Erlang relatex lexer/parser files
     autocmd BufNewFile,BufRead *.[xy]rl setlocal ft=erlang ts=2 sw=2
+    " Git commit messages
+    autocmd FileType gitcommit setlocal spell colorcolumn=73
 endif
 
 " Fancy features

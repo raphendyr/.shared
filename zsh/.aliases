@@ -83,7 +83,7 @@ if type -p crc >/dev/null; then
 	oc() {
 		unset -f oc
 		eval "$(crc oc-env)"
-		rehash
+		if command -v rehash >/dev/null; then rehash; fi
 		command oc "$@"
 	}
 fi
